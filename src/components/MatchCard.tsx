@@ -26,7 +26,7 @@ export const MatchCard = ({
   awayForm,
 }: MatchCardProps) => {
   return (
-    <Card className="bg-gradient-to-br from-[#1a2840] to-[#0f1828] border-border p-8 max-w-2xl mx-auto">
+    <Card className="bg-gradient-to-br from-[#1e3a5f] to-[#0d1b2a] border-border p-8 max-w-2xl mx-auto">
       <div className="text-center mb-6">
         <p className="text-sm text-muted-foreground mb-2">{round}</p>
         <h2 className="text-2xl font-bold text-foreground">
