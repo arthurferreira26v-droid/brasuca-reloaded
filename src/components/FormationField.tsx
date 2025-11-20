@@ -45,10 +45,6 @@ export const FormationField = ({ formation, players }: FormationFieldProps) => {
               <div className="w-10 h-10 bg-black border-2 border-white rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-white text-xs font-bold">{player.number}</span>
               </div>
-              {/* Overall rating */}
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#c8ff00] rounded-full flex items-center justify-center">
-                <span className="text-black text-[10px] font-bold">{player.overall}</span>
-              </div>
             </div>
             {/* Nome do jogador */}
             <div className="bg-black/70 px-2 py-0.5 rounded text-white text-[10px] font-medium whitespace-nowrap">
