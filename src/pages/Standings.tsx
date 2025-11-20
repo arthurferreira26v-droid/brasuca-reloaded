@@ -1,9 +1,15 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { StandingsTable } from "@/components/StandingsTable";
 import { ChevronLeft } from "lucide-react";
 
 const Standings = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const teamName = searchParams.get("time") || "Botafogo";
+
+  const handleBack = () => {
+    navigate(`/jogo?time=${teamName}`);
+  };
 
   return (
     <div className="min-h-screen bg-black">
@@ -11,7 +17,7 @@ const Standings = () => {
       <header className="border-b border-border bg-black backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white/10 transition-colors"
           >
             <ChevronLeft className="w-6 h-6 text-white" />

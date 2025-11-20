@@ -32,7 +32,7 @@ export const GameMenu = ({ teamName }: GameMenuProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
-            onClick={() => navigate("/classificacao")}
+            onClick={() => navigate(`/classificacao?time=${teamName}`)}
           >
             <Trophy className="h-5 w-5" />
             <span className="text-base">Classificação</span>
