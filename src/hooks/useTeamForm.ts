@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export type MatchResult = 'V' | 'E' | 'D'; // Vitória, Empate, Derrota
+
 export const useTeamForm = (teamName: string, championshipId: string | undefined) => {
-  const [form, setForm] = useState<boolean[]>([]);
+  const [form, setForm] = useState<MatchResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,30 +28,33 @@ export const useTeamForm = (teamName: string, championshipId: string | undefined
         if (error) throw error;
 
         if (matches && matches.length > 0) {
-          // Converter os resultados em array de booleanos (vitória = true, empate/derrota = false)
-          const formResults = matches.map(match => {
+          // Converter os resultados em array de 'V', 'E' ou 'D'
+          const formResults: MatchResult[] = matches.map(match => {
             const isHome = match.home_team_name === teamName;
             const teamScore = isHome ? match.home_score : match.away_score;
             const opponentScore = isHome ? match.away_score : match.home_score;
 
-            // Vitória = true, empate ou derrota = false
-            return (teamScore !== null && opponentScore !== null) && teamScore > opponentScore;
+            if (teamScore === null || opponentScore === null) return 'D';
+            
+            if (teamScore > opponentScore) return 'V'; // Vitória
+            if (teamScore === opponentScore) return 'E'; // Empate
+            return 'D'; // Derrota
           }).reverse(); // Reverter para mostrar do mais antigo ao mais recente
 
-          // Preencher com false se tiver menos de 5 jogos
+          // Preencher com 'D' se tiver menos de 5 jogos
           while (formResults.length < 5) {
-            formResults.unshift(false);
+            formResults.unshift('D');
           }
 
           setForm(formResults);
         } else {
-          // Se não houver jogos, preencher com false
-          setForm([false, false, false, false, false]);
+          // Se não houver jogos, preencher com 'D'
+          setForm(['D', 'D', 'D', 'D', 'D']);
         }
       } catch (error) {
         console.error("Erro ao buscar histórico do time:", error);
         // Em caso de erro, usar valores padrão
-        setForm([false, false, false, false, false]);
+        setForm(['D', 'D', 'D', 'D', 'D']);
       } finally {
         setLoading(false);
       }

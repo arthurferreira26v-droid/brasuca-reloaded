@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { getTeamLogo } from "@/utils/teamLogos";
+import { MatchResult } from "@/hooks/useTeamForm";
 
 interface MatchCardProps {
   userTeam: string;
@@ -11,8 +12,8 @@ interface MatchCardProps {
   opponentLogo: string;
   opponentPosition: string;
   round: string;
-  userForm: boolean[];
-  opponentForm: boolean[];
+  userForm: MatchResult[];
+  opponentForm: MatchResult[];
   isHome: boolean;
 }
 
@@ -66,16 +67,18 @@ export const MatchCard = ({
             </div>
           </div>
           <div className="flex gap-1">
-            {leftForm.map((win, i) => (
+            {leftForm.map((result, i) => (
               <div 
                 key={i} 
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  win 
+                  result === 'V'
                     ? 'bg-green-600 text-white' 
+                    : result === 'E'
+                    ? 'bg-gray-600 text-white'
                     : 'bg-red-600 text-white'
                 }`}
               >
-                {win ? '✓' : 'X'}
+                {result === 'V' ? '✓' : result === 'E' ? '−' : 'X'}
               </div>
             ))}
           </div>
@@ -103,16 +106,18 @@ export const MatchCard = ({
             </div>
           </div>
           <div className="flex gap-1">
-            {rightForm.map((win, i) => (
+            {rightForm.map((result, i) => (
               <div 
                 key={i} 
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  win 
+                  result === 'V'
                     ? 'bg-green-600 text-white' 
+                    : result === 'E'
+                    ? 'bg-gray-600 text-white'
                     : 'bg-red-600 text-white'
                 }`}
               >
-                {win ? '✓' : 'X'}
+                {result === 'V' ? '✓' : result === 'E' ? '−' : 'X'}
               </div>
             ))}
           </div>
