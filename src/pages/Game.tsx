@@ -3,7 +3,8 @@ import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
 import { teams } from "@/data/teams";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
+import { useChampionship } from "@/hooks/useChampionship";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
@@ -13,17 +14,44 @@ const Game = () => {
   // Find the selected team
   const selectedTeam = teams.find(t => t.name === teamName);
   
-  // Get a random opponent from Brazilian league
+  // Get championship data
+  const { championship, nextMatch, loading } = useChampionship(teamName);
+  
+  // Get Brazilian teams for the menu
   const brazilianTeams = teams.filter(
     t => t.league === "brasileiro" && t.name !== teamName
   );
-  const opponent = brazilianTeams[Math.floor(Math.random() * brazilianTeams.length)];
 
   // Generate random form (últimos 5 jogos)
   const generateForm = () => Array.from({ length: 5 }, () => Math.random() > 0.4);
   
-  // Randomly determine if match is home or away
-  const isHome = Math.random() > 0.5;
+  // Determine if user is home or away based on match data
+  const isHome = nextMatch ? nextMatch.home_team_name === teamName : false;
+  const opponentName = nextMatch 
+    ? (isHome ? nextMatch.away_team_name : nextMatch.home_team_name)
+    : "";
+  const opponentLogo = nextMatch
+    ? (isHome ? nextMatch.away_team_logo : nextMatch.home_team_logo)
+    : "";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
+  if (!nextMatch) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Campeonato Finalizado!</h2>
+          <p className="text-muted-foreground">Todas as partidas foram jogadas.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -70,10 +98,10 @@ const Game = () => {
           userTeam={teamName}
           userLogo={selectedTeam?.logo || ""}
           userPosition="1º"
-          opponentTeam={opponent?.name || "Adversário"}
-          opponentLogo={opponent?.logo || ""}
+          opponentTeam={opponentName}
+          opponentLogo={opponentLogo}
           opponentPosition="8º"
-          round="7ª Rodada"
+          round={`${nextMatch.round}ª Rodada`}
           userForm={generateForm()}
           opponentForm={generateForm()}
           isHome={isHome}
