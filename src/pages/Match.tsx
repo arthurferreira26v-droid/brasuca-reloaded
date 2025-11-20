@@ -1,9 +1,12 @@
+// @ts-nocheck - Database types will be updated after migration
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TacticsManager } from "@/components/TacticsManager";
 import { ChevronLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Match = () => {
   const [searchParams] = useSearchParams();
@@ -18,9 +21,119 @@ const Match = () => {
   const [shots, setShots] = useState({ home: 0, away: 0 });
   const [fouls, setFouls] = useState({ home: 0, away: 0 });
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isSavingMatch, setIsSavingMatch] = useState(false);
 
   const selectedTeam = teams.find(t => t.name === teamName);
   const opponent = teams.find(t => t.name === opponentName);
+
+  const saveMatchResult = async () => {
+    if (isSavingMatch) return;
+    setIsSavingMatch(true);
+
+    try {
+      // Buscar a partida atual
+      const { data: championship } = await supabase
+        .from("championships")
+        .select("id")
+        .eq("name", `Brasileirão - ${teamName}`)
+        .single();
+
+      if (!championship) throw new Error("Campeonato não encontrado");
+
+      const { data: match } = await supabase
+        .from("matches")
+        .select("*")
+        .eq("championship_id", championship.id)
+        .eq("is_played", false)
+        .or(`home_team_name.eq.${teamName},away_team_name.eq.${teamName}`)
+        .order("round", { ascending: true })
+        .limit(1)
+        .single();
+
+      if (!match) throw new Error("Partida não encontrada");
+
+      // Atualizar resultado da partida
+      await supabase
+        .from("matches")
+        .update({
+          home_score: homeScore,
+          away_score: awayScore,
+          is_played: true,
+        })
+        .eq("id", match.id);
+
+      // Atualizar classificação - sistema de pontos: vitória=3, empate=1, derrota=0
+      const homeTeamName = match.home_team_name;
+      const awayTeamName = match.away_team_name;
+
+      const { data: standings } = await supabase
+        .from("standings")
+        .select("*")
+        .eq("championship_id", championship.id)
+        .in("team_name", [homeTeamName, awayTeamName]);
+
+      if (standings && standings.length === 2) {
+        const homeStanding = standings.find(s => s.team_name === homeTeamName);
+        const awayStanding = standings.find(s => s.team_name === awayTeamName);
+
+        if (homeStanding && awayStanding) {
+          let homePoints = 0;
+          let awayPoints = 0;
+          let homeWins = 0;
+          let awayWins = 0;
+          let homeDraws = 0;
+          let awayDraws = 0;
+          let homeLosses = 0;
+          let awayLosses = 0;
+
+          if (homeScore > awayScore) {
+            homePoints = 3; // Vitória
+            homeWins = 1;
+            awayLosses = 1;
+          } else if (homeScore < awayScore) {
+            awayPoints = 3; // Vitória
+            awayWins = 1;
+            homeLosses = 1;
+          } else {
+            homePoints = 1; // Empate
+            awayPoints = 1; // Empate
+            homeDraws = 1;
+            awayDraws = 1;
+          }
+
+          await supabase.from("standings").update({
+            points: homeStanding.points + homePoints,
+            played: homeStanding.played + 1,
+            wins: homeStanding.wins + homeWins,
+            draws: homeStanding.draws + homeDraws,
+            losses: homeStanding.losses + homeLosses,
+            goals_for: homeStanding.goals_for + homeScore,
+            goals_against: homeStanding.goals_against + awayScore,
+            goal_difference: (homeStanding.goals_for + homeScore) - (homeStanding.goals_against + awayScore),
+          }).eq("id", homeStanding.id);
+
+          await supabase.from("standings").update({
+            points: awayStanding.points + awayPoints,
+            played: awayStanding.played + 1,
+            wins: awayStanding.wins + awayWins,
+            draws: awayStanding.draws + awayDraws,
+            losses: awayStanding.losses + awayLosses,
+            goals_for: awayStanding.goals_for + awayScore,
+            goals_against: awayStanding.goals_against + homeScore,
+            goal_difference: (awayStanding.goals_for + awayScore) - (awayStanding.goals_against + homeScore),
+          }).eq("id", awayStanding.id);
+        }
+      }
+
+      toast.success("Resultado salvo com sucesso!");
+      setTimeout(() => {
+        navigate(`/jogo?time=${teamName}`);
+      }, 1000);
+    } catch (error) {
+      console.error("Erro ao salvar resultado:", error);
+      toast.error("Erro ao salvar resultado");
+    }
+  };
 
   // Timer: 90 minutos em 30 segundos reais (333ms por minuto)
   useEffect(() => {
@@ -209,10 +322,11 @@ const Match = () => {
                 {homeScore} - {awayScore}
               </div>
               <button
-                onClick={() => navigate(`/jogo?time=${teamName}`)}
-                className="w-full bg-accent hover:bg-accent/90 text-black font-bold py-3 px-6 rounded-lg transition-colors"
+                onClick={saveMatchResult}
+                disabled={isSavingMatch}
+                className="w-full bg-accent hover:bg-accent/90 text-black font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
               >
-                VOLTAR
+                {isSavingMatch ? "Salvando..." : "Continuar"}
               </button>
             </div>
           </div>

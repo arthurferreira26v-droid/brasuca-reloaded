@@ -26,10 +26,19 @@ interface Championship {
   total_rounds: number;
 }
 
+interface Standing {
+  team_name: string;
+  points: number;
+  played: number;
+  goal_difference: number;
+}
+
 export const useChampionship = (userTeamName: string) => {
   const [championship, setChampionship] = useState<Championship | null>(null);
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isChampionComplete, setIsChampionComplete] = useState(false);
+  const [userWonChampionship, setUserWonChampionship] = useState(false);
 
   const generateChampionshipFixtures = (userTeam: Team, allTeams: Team[]) => {
     const fixtures: Omit<Match, "id" | "championship_id">[] = [];
@@ -138,14 +147,27 @@ export const useChampionship = (userTeamName: string) => {
             .eq("is_played", false)
             .limit(1);
           
-          // Se não há partidas restantes, resetar campeonato
+          // Se não há partidas restantes, verificar vencedor
           if (!remainingMatches || remainingMatches.length === 0) {
-            needsReset = true;
+            setIsChampionComplete(true);
             
-            // Deletar campeonato atual e dados relacionados
-            await supabase.from("matches").delete().eq("championship_id", championshipId);
-            await supabase.from("standings").delete().eq("championship_id", championshipId);
-            await supabase.from("championships").delete().eq("id", championshipId);
+            // Verificar se o usuário ganhou o campeonato
+            const { data: standings } = await supabase
+              .from("standings")
+              .select("team_name, points, played, goal_difference")
+              .eq("championship_id", championshipId)
+              .order("points", { ascending: false })
+              .order("goal_difference", { ascending: false })
+              .limit(1);
+            
+            if (standings && standings.length > 0) {
+              const winner = standings[0];
+              setUserWonChampionship(winner.team_name === userTeamName);
+            }
+            
+            setChampionship(existingChampionships[0]);
+            setLoading(false);
+            return;
           } else {
             setChampionship(existingChampionships[0]);
           }
@@ -227,5 +249,28 @@ export const useChampionship = (userTeamName: string) => {
     initChampionship();
   }, [userTeamName]);
 
-  return { championship, nextMatch, loading };
+  const resetChampionship = async () => {
+    if (!championship) return;
+    
+    setLoading(true);
+    
+    // Deletar campeonato atual e dados relacionados
+    await supabase.from("matches").delete().eq("championship_id", championship.id);
+    await supabase.from("standings").delete().eq("championship_id", championship.id);
+    await supabase.from("championships").delete().eq("id", championship.id);
+    
+    // Reinicializar
+    setIsChampionComplete(false);
+    setUserWonChampionship(false);
+    window.location.href = "/";
+  };
+
+  return { 
+    championship, 
+    nextMatch, 
+    loading, 
+    isChampionComplete, 
+    userWonChampionship,
+    resetChampionship 
+  };
 };

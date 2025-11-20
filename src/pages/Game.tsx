@@ -15,7 +15,7 @@ const Game = () => {
   const selectedTeam = teams.find(t => t.name === teamName);
   
   // Get championship data
-  const { championship, nextMatch, loading } = useChampionship(teamName);
+  const { championship, nextMatch, loading, isChampionComplete, userWonChampionship, resetChampionship } = useChampionship(teamName);
   
   // Get Brazilian teams for the menu
   const brazilianTeams = teams.filter(
@@ -42,12 +42,61 @@ const Game = () => {
     );
   }
 
+  // Tela de fim de campeonato
+  if (isChampionComplete && !loading) {
+    if (userWonChampionship) {
+      // Tela de celebração
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-yellow-500/20 via-black to-black flex items-center justify-center">
+          <div className="text-center px-4 max-w-2xl">
+            <div className="mb-8 animate-bounce">
+              <div className="text-8xl mb-4">🏆</div>
+              <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600 mb-4">
+                CAMPEÃO!
+              </h1>
+              <p className="text-2xl md:text-3xl text-white font-bold mb-2">
+                {teamName}
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Parabéns! Você conquistou o Brasileirão 2024!
+              </p>
+            </div>
+            
+            <button
+              onClick={resetChampionship}
+              className="bg-white hover:bg-gray-100 text-black font-bold text-xl py-4 px-12 rounded-lg transition-all transform hover:scale-105"
+            >
+              Avançar
+            </button>
+          </div>
+        </div>
+      );
+    } else {
+      // Botão de avançar simples
+      return (
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl font-bold text-white mb-4">Campeonato Finalizado</h2>
+            <p className="text-muted-foreground mb-8">O campeonato chegou ao fim.</p>
+            
+            <button
+              onClick={resetChampionship}
+              className="bg-white hover:bg-gray-100 text-black font-bold text-xl py-4 px-12 rounded-lg transition-colors"
+            >
+              Avançar
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
+
   if (!nextMatch && !loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00] mb-4 mx-auto" />
-          <p className="text-muted-foreground">Preparando novo campeonato...</p>
+          <p className="text-muted-foreground">Preparando próxima partida...</p>
         </div>
       </div>
     );
