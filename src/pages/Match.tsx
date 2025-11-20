@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
+import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TacticsManager } from "@/components/TacticsManager";
 import { ChevronLeft } from "lucide-react";
@@ -25,6 +26,12 @@ const Match = () => {
 
   const selectedTeam = teams.find(t => t.name === teamName);
   const opponent = teams.find(t => t.name === opponentName);
+
+  // Initialize players
+  const userPlayers = teamName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(teamName);
+  const opponentPlayers = opponentName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(opponentName);
+  const userStarters = userPlayers.filter(p => p.isStarter);
+  const opponentStarters = opponentPlayers.filter(p => p.isStarter);
 
   const saveMatchResult = async () => {
     if (isSavingMatch) return;
@@ -325,7 +332,7 @@ const Match = () => {
             </SheetTrigger>
             <SheetContent side="left" className="bg-black border-border w-full sm:max-w-lg">
               <div className="mt-8">
-                <TacticsManager teamName={opponentName} />
+                <TacticsManager teamName={opponentName} players={opponentStarters} />
               </div>
             </SheetContent>
           </Sheet>
@@ -349,7 +356,7 @@ const Match = () => {
             </SheetTrigger>
             <SheetContent side="right" className="bg-black border-border w-full sm:max-w-lg">
               <div className="mt-8">
-                <TacticsManager teamName={teamName} />
+                <TacticsManager teamName={teamName} players={userStarters} />
               </div>
             </SheetContent>
           </Sheet>
@@ -401,7 +408,7 @@ const Match = () => {
             </SheetTrigger>
             <SheetContent side="bottom" className="bg-black border-border h-[90vh]">
               <div className="mt-8 overflow-y-auto h-full pb-20">
-                <TacticsManager teamName={teamName} />
+                <TacticsManager teamName={teamName} players={userStarters} />
               </div>
             </SheetContent>
           </Sheet>

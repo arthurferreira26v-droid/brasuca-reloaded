@@ -8,6 +8,7 @@ import { teams } from "@/data/teams";
 import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
+import { useTeamForm } from "@/hooks/useTeamForm";
 import { getTeamLogo } from "@/utils/teamLogos";
 
 const Game = () => {
@@ -32,9 +33,6 @@ const Game = () => {
   const brazilianTeams = teams.filter(
     t => t.league === "brasileiro" && t.name !== teamName
   );
-
-  // Generate random form (últimos 5 jogos)
-  const generateForm = () => Array.from({ length: 5 }, () => Math.random() > 0.4);
   
   // Determine if user is home or away based on match data
   const isHome = nextMatch ? nextMatch.home_team_name === teamName : false;
@@ -45,7 +43,11 @@ const Game = () => {
     ? (isHome ? nextMatch.away_team_logo : nextMatch.home_team_logo)
     : "";
 
-  if (loading) {
+  // Buscar os últimos 5 resultados reais de cada time
+  const { form: userForm, loading: userFormLoading } = useTeamForm(teamName, championship?.id);
+  const { form: opponentForm, loading: opponentFormLoading } = useTeamForm(opponentName, championship?.id);
+
+  if (loading || userFormLoading || opponentFormLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
@@ -166,8 +168,8 @@ const Game = () => {
           opponentLogo={getTeamLogo(opponentName, opponentLogo)}
           opponentPosition="8º"
           round={`${nextMatch.round}ª Rodada`}
-          userForm={generateForm()}
-          opponentForm={generateForm()}
+          userForm={userForm}
+          opponentForm={opponentForm}
           isHome={isHome}
         />
       </div>
