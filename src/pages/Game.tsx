@@ -77,7 +77,7 @@ const Game = () => {
       </div>
 
       {/* Tactics Manager Section */}
-      <div className="container mx-auto px-4 pb-12">
+      <div className="container mx-auto px-4 pb-12 pt-8">
         <TacticsManager teamName={teamName} />
       </div>
     </div>
