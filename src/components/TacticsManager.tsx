@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { FormationField } from "@/components/FormationField";
-import { TacticsSelector } from "@/components/TacticsSelector";
-import { formations } from "@/data/formations";
+import { formations, playStyles } from "@/data/formations";
 import { botafogoPlayers, generateTeamPlayers } from "@/data/players";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronDown } from "lucide-react";
 
 interface TacticsManagerProps {
   teamName: string;
@@ -12,73 +11,88 @@ interface TacticsManagerProps {
 export const TacticsManager = ({ teamName }: TacticsManagerProps) => {
   const [selectedFormation, setSelectedFormation] = useState("4-3-3");
   const [selectedPlayStyle, setSelectedPlayStyle] = useState("counter");
+  const [openDropdown, setOpenDropdown] = useState<"style" | "formation" | null>(null);
 
   const formation = formations.find((f) => f.id === selectedFormation) || formations[0];
+  const playStyle = playStyles.find((s) => s.id === selectedPlayStyle) || playStyles[0];
   
   // Use jogadores do Botafogo ou gere jogadores genéricos
   const players = teamName === "Botafogo" 
     ? botafogoPlayers 
     : generateTeamPlayers(teamName);
 
+  const toggleDropdown = (dropdown: "style" | "formation") => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
+
   return (
-    <div className="bg-[#050B2B] border border-[#0a1540] rounded-lg p-4 md:p-6">
-      <h2 className="text-xl font-bold text-white mb-4">Gerenciar Time</h2>
-      
-      <Tabs defaultValue="tactics" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/5 mb-4">
-          <TabsTrigger 
-            value="tactics"
-            className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black"
+    <div className="bg-black p-4 md:p-6">
+      {/* Botões de Estilo de Jogo e Tática */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* Estilo de Jogo */}
+        <div className="relative">
+          <button
+            onClick={() => toggleDropdown("style")}
+            className="w-full bg-white text-black rounded-lg px-4 py-3 flex items-center justify-between font-medium hover:bg-white/90 transition-colors"
           >
-            Táticas
-          </TabsTrigger>
-          <TabsTrigger 
-            value="lineup"
-            className="data-[state=active]:bg-[#c8ff00] data-[state=active]:text-black"
-          >
-            Escalação
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="tactics" className="space-y-4">
-          <TacticsSelector
-            selectedFormation={selectedFormation}
-            selectedPlayStyle={selectedPlayStyle}
-            onFormationChange={setSelectedFormation}
-            onPlayStyleChange={setSelectedPlayStyle}
-          />
-        </TabsContent>
-
-        <TabsContent value="lineup">
-          <FormationField formation={formation} players={players} />
+            <span>{playStyle.name}</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${openDropdown === "style" ? "rotate-180" : ""}`} />
+          </button>
           
-          {/* Lista de jogadores */}
-          <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-semibold text-white mb-2">Titulares</h3>
-            <div className="space-y-1">
-              {players.slice(0, 11).map((player) => (
-                <div
-                  key={player.id}
-                  className="flex items-center justify-between bg-white/5 rounded p-2 hover:bg-white/10 transition-colors"
+          {openDropdown === "style" && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg overflow-hidden shadow-lg z-50">
+              {playStyles.map((style) => (
+                <button
+                  key={style.id}
+                  onClick={() => {
+                    setSelectedPlayStyle(style.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors ${
+                    selectedPlayStyle === style.id ? "bg-[#c8ff00]" : ""
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-black border border-white/20 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">{player.number}</span>
-                    </div>
-                    <div>
-                      <p className="text-white text-sm font-medium">{player.name}</p>
-                      <p className="text-muted-foreground text-xs">{player.position}</p>
-                    </div>
-                  </div>
-                  <div className="bg-[#c8ff00] px-2 py-1 rounded">
-                    <span className="text-black text-xs font-bold">{player.overall}</span>
-                  </div>
-                </div>
+                  <div className="font-medium text-black">{style.name}</div>
+                  <div className="text-xs text-gray-600">{style.description}</div>
+                </button>
               ))}
             </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+          )}
+        </div>
+
+        {/* Tática (Formação) */}
+        <div className="relative">
+          <button
+            onClick={() => toggleDropdown("formation")}
+            className="w-full bg-white text-black rounded-lg px-4 py-3 flex items-center justify-between font-medium hover:bg-white/90 transition-colors"
+          >
+            <span>{formation.name}</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${openDropdown === "formation" ? "rotate-180" : ""}`} />
+          </button>
+          
+          {openDropdown === "formation" && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg overflow-hidden shadow-lg z-50">
+              {formations.map((form) => (
+                <button
+                  key={form.id}
+                  onClick={() => {
+                    setSelectedFormation(form.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors ${
+                    selectedFormation === form.id ? "bg-[#c8ff00]" : ""
+                  }`}
+                >
+                  <div className="font-medium text-black">{form.name}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Campo */}
+      <FormationField formation={formation} players={players} />
     </div>
   );
 };
