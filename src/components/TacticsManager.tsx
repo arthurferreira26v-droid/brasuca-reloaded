@@ -27,8 +27,11 @@ export const TacticsManager = ({ teamName }: TacticsManagerProps) => {
 
   return (
     <div className="bg-black p-4 md:p-6">
+      {/* Campo */}
+      <FormationField formation={formation} players={players} />
+
       {/* Botões de Estilo de Jogo e Tática */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mt-6">
         {/* Estilo de Jogo */}
         <div className="relative">
           <button
@@ -90,9 +93,6 @@ export const TacticsManager = ({ teamName }: TacticsManagerProps) => {
           )}
         </div>
       </div>
-
-      {/* Campo */}
-      <FormationField formation={formation} players={players} />
     </div>
   );
 };
