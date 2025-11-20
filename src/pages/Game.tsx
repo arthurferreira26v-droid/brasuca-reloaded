@@ -1,6 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
+import { TacticsManager } from "@/components/TacticsManager";
 import { teams } from "@/data/teams";
 import { ChevronRight } from "lucide-react";
 
@@ -61,7 +62,7 @@ const Game = () => {
       </header>
 
       {/* Match Section */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-8">
         <MatchCard
           homeTeam={opponent?.name || "Adversário"}
           homeLogo={opponent?.logo || ""}
@@ -73,6 +74,11 @@ const Game = () => {
           homeForm={generateForm()}
           awayForm={generateForm()}
         />
+      </div>
+
+      {/* Tactics Manager Section */}
+      <div className="container mx-auto px-4 pb-12">
+        <TacticsManager teamName={teamName} />
       </div>
     </div>
   );
