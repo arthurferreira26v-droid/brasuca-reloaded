@@ -105,13 +105,17 @@ export const useChampionship = (userTeamName: string) => {
         return;
       }
 
-      const brazilianTeams = teams.filter(t => t.league === "brasileiro");
+      // Buscar times da mesma liga do usuário
+      const leagueTeams = teams.filter(t => t.league === userTeam.league);
+      const championshipName = userTeam.league === "brasileiro" 
+        ? `Brasileirão - ${userTeamName}`
+        : `Liga dos Campeões - ${userTeamName}`;
 
       try {
         const { data: existingChampionships, error: fetchError } = await supabase
           .from("championships")
           .select("*")
-          .eq("name", `Brasileirão - ${userTeamName}`)
+          .eq("name", championshipName)
           .limit(1);
 
         if (fetchError) throw fetchError;
@@ -160,10 +164,10 @@ export const useChampionship = (userTeamName: string) => {
           const { data: newChampionship, error: createError } = await supabase
             .from("championships")
             .insert({
-              name: `Brasileirão - ${userTeamName}`,
+              name: championshipName,
               season: "2024",
               current_round: 1,
-              total_rounds: (brazilianTeams.length - 1) * 2,
+              total_rounds: (leagueTeams.length - 1) * 2,
             })
             .select()
             .maybeSingle();
@@ -174,7 +178,7 @@ export const useChampionship = (userTeamName: string) => {
           championshipId = newChampionship.id;
           setChampionship(newChampionship);
 
-          const fixtures = generateChampionshipFixtures(userTeam, brazilianTeams);
+          const fixtures = generateChampionshipFixtures(userTeam, leagueTeams);
           const fixturesWithChampionship = fixtures.map(f => ({
             ...f,
             championship_id: championshipId,
@@ -186,7 +190,7 @@ export const useChampionship = (userTeamName: string) => {
 
           if (insertError) throw insertError;
 
-          const standingsData = brazilianTeams.map(team => ({
+          const standingsData = leagueTeams.map(team => ({
             championship_id: championshipId,
             team_id: team.id,
             team_name: team.name,
