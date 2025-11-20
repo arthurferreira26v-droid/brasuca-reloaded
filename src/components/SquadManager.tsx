@@ -77,8 +77,8 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
   ];
   const forwards = [
     ...getStartersByPosition("PE"),
-    ...getStartersByPosition("PD"),
     ...getStartersByPosition("ATA"),
+    ...getStartersByPosition("PD"),
   ];
 
   const PlayerCircle = ({ player, onClick, isClickable }: { player: Player; onClick?: () => void; isClickable?: boolean }) => (
@@ -94,6 +94,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         </div>
       </div>
       <span className="mt-1 text-white text-xs bg-black/70 px-2 py-0.5 rounded">{player.name}</span>
+      <span className="text-white text-[10px] bg-black/70 px-2 py-0.5 rounded mt-0.5 font-semibold">{player.position}</span>
     </div>
   );
 
