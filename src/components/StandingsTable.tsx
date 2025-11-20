@@ -1,7 +1,79 @@
-import { brazilianStandings } from "@/data/standings";
-import { ChevronUp, ChevronDown, Minus } from "lucide-react";
+// @ts-nocheck - Database types will be updated after migration
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+
+interface Standing {
+  id: string;
+  team_name: string;
+  logo: string;
+  points: number;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  position: number;
+}
 
 export const StandingsTable = () => {
+  const [searchParams] = useSearchParams();
+  const teamName = searchParams.get("time") || "Botafogo";
+  const [standings, setStandings] = useState<Standing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStandings = async () => {
+      try {
+        const { data: championship } = await supabase
+          .from("championships")
+          .select("id")
+          .eq("name", `Brasileirão - ${teamName}`)
+          .maybeSingle();
+
+        if (!championship) {
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("standings")
+          .select("*")
+          .eq("championship_id", championship.id)
+          .order("points", { ascending: false })
+          .order("goal_difference", { ascending: false })
+          .order("goals_for", { ascending: false });
+
+        if (error) throw error;
+
+        // Atualizar posições
+        const standingsWithPositions = data?.map((team, index) => ({
+          ...team,
+          position: index + 1,
+        })) || [];
+
+        setStandings(standingsWithPositions);
+      } catch (error) {
+        console.error("Erro ao buscar classificação:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStandings();
+  }, [teamName]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
   const getPositionColor = (position: number) => {
     if (position <= 4) return "text-[#00ff87]"; // Libertadores
     if (position <= 6) return "text-[#00b8ff]"; // Pré-Libertadores
@@ -50,8 +122,8 @@ export const StandingsTable = () => {
 
       {/* Table Body */}
       <div className="divide-y divide-border">
-        {brazilianStandings.map((team) => (
-          <div key={team.teamId}>
+        {standings.map((team) => (
+          <div key={team.id}>
             {/* Desktop View */}
             <div className="hidden md:grid grid-cols-[auto_50px_1fr_repeat(8,50px)] gap-2 px-4 py-3 hover:bg-white/5 transition-colors items-center">
               {/* Position Indicator */}
@@ -67,9 +139,9 @@ export const StandingsTable = () => {
               {/* Team Name & Logo */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center p-1">
-                  <img src={team.logo} alt={team.teamName} className="w-full h-full object-contain" />
+                  <img src={team.logo} alt={team.team_name} className="w-full h-full object-contain" />
                 </div>
-                <span className="font-medium text-white truncate">{team.teamName}</span>
+                <span className="font-medium text-white truncate">{team.team_name}</span>
               </div>
               
               {/* Stats */}
@@ -78,16 +150,16 @@ export const StandingsTable = () => {
               <div className="text-center text-green-500">{team.wins}</div>
               <div className="text-center text-muted-foreground">{team.draws}</div>
               <div className="text-center text-red-500">{team.losses}</div>
-              <div className="text-center text-muted-foreground">{team.goalsFor}</div>
-              <div className="text-center text-muted-foreground">{team.goalsAgainst}</div>
+              <div className="text-center text-muted-foreground">{team.goals_for}</div>
+              <div className="text-center text-muted-foreground">{team.goals_against}</div>
               <div className={`text-center font-medium ${
-                team.goalDifference > 0 
+                team.goal_difference > 0 
                   ? 'text-green-500' 
-                  : team.goalDifference < 0 
-                  ? 'text-red-500' 
-                  : 'text-muted-foreground'
+                  : team.goal_difference < 0 
+                    ? 'text-red-500' 
+                    : 'text-muted-foreground'
               }`}>
-                {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
+                {team.goal_difference > 0 ? '+' : ''}{team.goal_difference}
               </div>
             </div>
 
@@ -106,22 +178,22 @@ export const StandingsTable = () => {
               {/* Team Name & Logo */}
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center p-1">
-                  <img src={team.logo} alt={team.teamName} className="w-full h-full object-contain" />
+                  <img src={team.logo} alt={team.team_name} className="w-full h-full object-contain" />
                 </div>
-                <span className="font-medium text-white text-sm truncate">{team.teamName}</span>
+                <span className="font-medium text-white truncate text-sm">{team.team_name}</span>
               </div>
               
-              {/* Stats (mobile: PTS, J, SG) */}
+              {/* Stats */}
               <div className="text-center font-bold text-white">{team.points}</div>
               <div className="text-center text-muted-foreground">{team.played}</div>
               <div className={`text-center font-medium ${
-                team.goalDifference > 0 
+                team.goal_difference > 0 
                   ? 'text-green-500' 
-                  : team.goalDifference < 0 
-                  ? 'text-red-500' 
-                  : 'text-muted-foreground'
+                  : team.goal_difference < 0 
+                    ? 'text-red-500' 
+                    : 'text-muted-foreground'
               }`}>
-                {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
+                {team.goal_difference > 0 ? '+' : ''}{team.goal_difference}
               </div>
             </div>
           </div>
@@ -129,18 +201,24 @@ export const StandingsTable = () => {
       </div>
 
       {/* Legend */}
-      <div className="bg-white/5 border-t border-border px-4 py-4 space-y-2 text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-[#00ff87] rounded" />
-          <span className="text-muted-foreground">Libertadores (1º - 4º)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-[#00b8ff] rounded" />
-          <span className="text-muted-foreground">Pré-Libertadores (5º - 6º)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded" />
-          <span className="text-muted-foreground">Rebaixamento (17º - 20º)</span>
+      <div className="bg-white/5 border-t border-border px-4 py-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-[#00ff87] rounded-full" />
+            <span className="text-muted-foreground">Libertadores</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-[#00b8ff] rounded-full" />
+            <span className="text-muted-foreground">Pré-Libertadores</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-white/20 rounded-full" />
+            <span className="text-muted-foreground">Meio de tabela</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full" />
+            <span className="text-muted-foreground">Rebaixamento</span>
+          </div>
         </div>
       </div>
     </div>
