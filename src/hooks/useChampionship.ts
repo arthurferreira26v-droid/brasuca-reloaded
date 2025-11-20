@@ -42,71 +42,54 @@ export const useChampionship = (userTeamName: string) => {
 
   const generateChampionshipFixtures = (userTeam: Team, allTeams: Team[]) => {
     const fixtures: Omit<Match, "id" | "championship_id">[] = [];
-    const opponents = allTeams.filter(t => t.id !== userTeam.id);
+    const numTeams = allTeams.length;
+    const rounds = (numTeams - 1) * 2; // Turno e returno
     
-    opponents.forEach((opponent, index) => {
-      const isHome = index % 2 === 0;
-      
-      if (isHome) {
+    // Algoritmo round-robin para gerar todos os jogos
+    // Cada time joga contra todos os outros 2 vezes (casa e fora)
+    const teams = [...allTeams];
+    
+    // Primeiro turno
+    for (let round = 0; round < numTeams - 1; round++) {
+      // Em cada rodada, metade dos times joga em casa e metade fora
+      for (let match = 0; match < numTeams / 2; match++) {
+        const home = teams[match];
+        const away = teams[numTeams - 1 - match];
+        
         fixtures.push({
-          round: index + 1,
-          home_team_id: userTeam.id,
-          home_team_name: userTeam.name,
-          home_team_logo: userTeam.logo,
-          away_team_id: opponent.id,
-          away_team_name: opponent.name,
-          away_team_logo: opponent.logo,
-          home_score: null,
-          away_score: null,
-          is_played: false,
-        });
-      } else {
-        fixtures.push({
-          round: index + 1,
-          home_team_id: opponent.id,
-          home_team_name: opponent.name,
-          home_team_logo: opponent.logo,
-          away_team_id: userTeam.id,
-          away_team_name: userTeam.name,
-          away_team_logo: userTeam.logo,
+          round: round + 1,
+          home_team_id: home.id,
+          home_team_name: home.name,
+          home_team_logo: home.logo,
+          away_team_id: away.id,
+          away_team_name: away.name,
+          away_team_logo: away.logo,
           home_score: null,
           away_score: null,
           is_played: false,
         });
       }
-    });
-
-    opponents.forEach((opponent, index) => {
-      const roundNumber = opponents.length + index + 1;
-      const isHome = index % 2 !== 0;
       
-      if (isHome) {
-        fixtures.push({
-          round: roundNumber,
-          home_team_id: userTeam.id,
-          home_team_name: userTeam.name,
-          home_team_logo: userTeam.logo,
-          away_team_id: opponent.id,
-          away_team_name: opponent.name,
-          away_team_logo: opponent.logo,
-          home_score: null,
-          away_score: null,
-          is_played: false,
-        });
-      } else {
-        fixtures.push({
-          round: roundNumber,
-          home_team_id: opponent.id,
-          home_team_name: opponent.name,
-          home_team_logo: opponent.logo,
-          away_team_id: userTeam.id,
-          away_team_name: userTeam.name,
-          away_team_logo: userTeam.logo,
-          home_score: null,
-          away_score: null,
-          is_played: false,
-        });
-      }
+      // Rotacionar times (exceto o primeiro)
+      const lastTeam = teams.pop()!;
+      teams.splice(1, 0, lastTeam);
+    }
+    
+    // Segundo turno (inverter casa e fora)
+    const firstTurnMatches = [...fixtures];
+    firstTurnMatches.forEach((match) => {
+      fixtures.push({
+        round: match.round + (numTeams - 1),
+        home_team_id: match.away_team_id,
+        home_team_name: match.away_team_name,
+        home_team_logo: match.away_team_logo,
+        away_team_id: match.home_team_id,
+        away_team_name: match.home_team_name,
+        away_team_logo: match.home_team_logo,
+        home_score: null,
+        away_score: null,
+        is_played: false,
+      });
     });
 
     return fixtures;
