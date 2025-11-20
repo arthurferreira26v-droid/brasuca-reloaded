@@ -214,6 +214,7 @@ export const useChampionship = (userTeamName: string) => {
           .select("*")
           .eq("championship_id", championshipId)
           .eq("is_played", false)
+          .or(`home_team_name.eq.${userTeamName},away_team_name.eq.${userTeamName}`)
           .order("round", { ascending: true })
           .limit(1);
 
