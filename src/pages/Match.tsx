@@ -125,6 +125,100 @@ const Match = () => {
         }
       }
 
+      // Simular jogos dos outros times na mesma rodada
+      const currentRound = match.round;
+      const { data: otherMatches } = await supabase
+        .from("matches")
+        .select("*")
+        .eq("championship_id", championship.id)
+        .eq("round", currentRound)
+        .eq("is_played", false)
+        .neq("id", match.id);
+
+      if (otherMatches && otherMatches.length > 0) {
+        for (const otherMatch of otherMatches) {
+          // Simular resultado aleatório mas realista
+          const homeGoals = Math.floor(Math.random() * 4); // 0-3 gols
+          const awayGoals = Math.floor(Math.random() * 4); // 0-3 gols
+
+          // Atualizar partida
+          await supabase
+            .from("matches")
+            .update({
+              home_score: homeGoals,
+              away_score: awayGoals,
+              is_played: true,
+            })
+            .eq("id", otherMatch.id);
+
+          // Atualizar classificação dos times
+          const { data: otherStandings } = await supabase
+            .from("standings")
+            .select("*")
+            .eq("championship_id", championship.id)
+            .in("team_name", [otherMatch.home_team_name, otherMatch.away_team_name]);
+
+          if (otherStandings && otherStandings.length === 2) {
+            const homeStanding = otherStandings.find(s => s.team_name === otherMatch.home_team_name);
+            const awayStanding = otherStandings.find(s => s.team_name === otherMatch.away_team_name);
+
+            if (homeStanding && awayStanding) {
+              let homePoints = 0;
+              let awayPoints = 0;
+              let homeWins = 0;
+              let awayWins = 0;
+              let homeDraws = 0;
+              let awayDraws = 0;
+              let homeLosses = 0;
+              let awayLosses = 0;
+
+              if (homeGoals > awayGoals) {
+                homePoints = 3;
+                homeWins = 1;
+                awayLosses = 1;
+              } else if (homeGoals < awayGoals) {
+                awayPoints = 3;
+                awayWins = 1;
+                homeLosses = 1;
+              } else {
+                homePoints = 1;
+                awayPoints = 1;
+                homeDraws = 1;
+                awayDraws = 1;
+              }
+
+              await supabase.from("standings").update({
+                points: homeStanding.points + homePoints,
+                played: homeStanding.played + 1,
+                wins: homeStanding.wins + homeWins,
+                draws: homeStanding.draws + homeDraws,
+                losses: homeStanding.losses + homeLosses,
+                goals_for: homeStanding.goals_for + homeGoals,
+                goals_against: homeStanding.goals_against + awayGoals,
+                goal_difference: (homeStanding.goals_for + homeGoals) - (homeStanding.goals_against + awayGoals),
+              }).eq("id", homeStanding.id);
+
+              await supabase.from("standings").update({
+                points: awayStanding.points + awayPoints,
+                played: awayStanding.played + 1,
+                wins: awayStanding.wins + awayWins,
+                draws: awayStanding.draws + awayDraws,
+                losses: awayStanding.losses + awayLosses,
+                goals_for: awayStanding.goals_for + awayGoals,
+                goals_against: awayStanding.goals_against + homeGoals,
+                goal_difference: (awayStanding.goals_for + awayGoals) - (awayStanding.goals_against + homeGoals),
+              }).eq("id", awayStanding.id);
+            }
+          }
+        }
+      }
+
+      // Atualizar rodada atual do campeonato
+      await supabase
+        .from("championships")
+        .update({ current_round: currentRound + 1 })
+        .eq("id", championship.id);
+
       toast.success("Resultado salvo com sucesso!");
       setTimeout(() => {
         navigate(`/jogo?time=${teamName}`);
