@@ -1,3 +1,9 @@
+import realMadridLogo from "@/assets/teams/real-madrid.png";
+import barcelonaLogo from "@/assets/teams/barcelona.png";
+import manCityLogo from "@/assets/teams/man-city.png";
+import liverpoolLogo from "@/assets/teams/liverpool.png";
+import psgLogo from "@/assets/teams/psg.png";
+
 export interface Team {
   id: string;
   name: string;
@@ -22,12 +28,12 @@ export const teams: Team[] = [
   { id: "cruzeiro", name: "Cruzeiro", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg" },
 
   // Europeu
-  { id: "real-madrid", name: "Real Madrid", league: "europeu", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Logo_Real_Madrid.svg" },
-  { id: "barcelona", name: "Barcelona", league: "europeu", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/4/47/FC_Barcelona_%28crest%29.svg" },
-  { id: "man-city", name: "Manchester City", league: "europeu", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Manchester_City_FC_badge.svg" },
-  { id: "liverpool", name: "Liverpool", league: "europeu", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Liverpool_FC.svg" },
+  { id: "real-madrid", name: "Real Madrid", league: "europeu", rating: 5, logo: realMadridLogo },
+  { id: "barcelona", name: "Barcelona", league: "europeu", rating: 5, logo: barcelonaLogo },
+  { id: "man-city", name: "Manchester City", league: "europeu", rating: 5, logo: manCityLogo },
+  { id: "liverpool", name: "Liverpool", league: "europeu", rating: 4, logo: liverpoolLogo },
   { id: "bayern", name: "Bayern Munich", league: "europeu", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg" },
-  { id: "psg", name: "Paris Saint-Germain", league: "europeu", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/8/86/Paris_Saint-Germain_Logo.svg" },
+  { id: "psg", name: "Paris Saint-Germain", league: "europeu", rating: 4, logo: psgLogo },
   { id: "juventus", name: "Juventus", league: "europeu", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Juventus_FC_-_pictogram_black_%28Italy%2C_2017%29.svg" },
   { id: "milan", name: "AC Milan", league: "europeu", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" },
   { id: "chelsea", name: "Chelsea", league: "europeu", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Chelsea_FC.svg" },
