@@ -21,6 +21,9 @@ const Game = () => {
 
   // Generate random form (últimos 5 jogos)
   const generateForm = () => Array.from({ length: 5 }, () => Math.random() > 0.4);
+  
+  // Randomly determine if match is home or away
+  const isHome = Math.random() > 0.5;
 
   return (
     <div className="min-h-screen bg-black">
@@ -64,15 +67,16 @@ const Game = () => {
       {/* Match Section */}
       <div className="container mx-auto px-4 py-8">
         <MatchCard
-          homeTeam={opponent?.name || "Adversário"}
-          homeLogo={opponent?.logo || ""}
-          homePosition="8º"
-          awayTeam={teamName}
-          awayLogo={selectedTeam?.logo || ""}
-          awayPosition="1º"
+          userTeam={teamName}
+          userLogo={selectedTeam?.logo || ""}
+          userPosition="1º"
+          opponentTeam={opponent?.name || "Adversário"}
+          opponentLogo={opponent?.logo || ""}
+          opponentPosition="8º"
           round="7ª Rodada"
-          homeForm={generateForm()}
-          awayForm={generateForm()}
+          userForm={generateForm()}
+          opponentForm={generateForm()}
+          isHome={isHome}
         />
       </div>
 
