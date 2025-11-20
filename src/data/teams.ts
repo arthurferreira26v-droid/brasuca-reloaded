@@ -5,6 +5,10 @@ import liverpoolLogo from "@/assets/teams/liverpool.png";
 import psgLogo from "@/assets/teams/psg.png";
 import vascoLogo from "@/assets/teams/vasco.png";
 import santosLogo from "@/assets/teams/santos.png";
+import corinthiansLogo from "@/assets/teams/corinthians.png";
+import fluminenseLogo from "@/assets/teams/fluminense.png";
+import gremioLogo from "@/assets/teams/gremio.svg";
+import atleticoMgLogo from "@/assets/teams/atletico-mg.png";
 
 export interface Team {
   id: string;
@@ -20,13 +24,13 @@ export const teams: Team[] = [
   { id: "palmeiras", name: "Palmeiras", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg" },
   { id: "santos", name: "Santos", league: "brasileiro", rating: 4, logo: santosLogo },
   { id: "sao-paulo", name: "São Paulo", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Sao_Paulo_Futebol_Clube.svg" },
-  { id: "corinthians", name: "Corinthians", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Corinthians_simbolo.svg" },
-  { id: "gremio", name: "Grêmio", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Gremio.svg" },
-  { id: "atletico-mg", name: "Atlético Mineiro", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/5/54/Atletico_mineiro_galo.png" },
+  { id: "corinthians", name: "Corinthians", league: "brasileiro", rating: 4, logo: corinthiansLogo },
+  { id: "gremio", name: "Grêmio", league: "brasileiro", rating: 4, logo: gremioLogo },
+  { id: "atletico-mg", name: "Atlético Mineiro", league: "brasileiro", rating: 4, logo: atleticoMgLogo },
   { id: "internacional", name: "Internacional", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg" },
   { id: "botafogo", name: "Botafogo", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/5/52/Botafogo_de_Futebol_e_Regatas_logo.svg" },
   { id: "vasco", name: "Vasco da Gama", league: "brasileiro", rating: 3, logo: vascoLogo },
-  { id: "fluminense", name: "Fluminense", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/a/ad/Fluminense_FC_escudo.svg" },
+  { id: "fluminense", name: "Fluminense", league: "brasileiro", rating: 3, logo: fluminenseLogo },
   { id: "cruzeiro", name: "Cruzeiro", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg" },
 
   // Europeu
