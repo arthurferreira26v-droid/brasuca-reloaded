@@ -81,9 +81,6 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         } flex items-center justify-center text-black font-bold text-lg`}>
           {player.number}
         </div>
-        <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#c8ff00] flex items-center justify-center text-black text-xs font-bold">
-          {player.overall}
-        </div>
       </div>
       <span className="mt-1 text-white text-xs bg-black/70 px-2 py-0.5 rounded">{player.name}</span>
     </div>
@@ -101,11 +98,11 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         </div>
 
         {/* Campo com titulares */}
-        <div className="relative w-full aspect-[3/4] max-w-2xl mx-auto mb-6 bg-[#2d5016] rounded-xl overflow-hidden">
+        <div className="relative w-full max-w-md mx-auto mb-6 bg-[#1a4d2e] rounded-xl overflow-hidden" style={{ height: '500px' }}>
           {/* Campo de futebol */}
           <svg viewBox="0 0 300 400" className="w-full h-full">
             {/* Fundo verde */}
-            <rect width="300" height="400" fill="#2d5016" />
+            <rect width="300" height="400" fill="#1a4d2e" />
             
             {/* Linhas do campo */}
             <line x1="0" y1="200" x2="300" y2="200" stroke="white" strokeWidth="2" />
@@ -154,7 +151,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         </div>
 
         {/* Reservas */}
-        <div className="bg-zinc-900 rounded-lg p-4 max-w-2xl mx-auto">
+        <div className="bg-zinc-900 rounded-lg p-4 max-w-md mx-auto">
           <h3 className="text-white text-xl font-bold mb-4">Reservas</h3>
           <div className="space-y-2">
             {reserves.map(player => (
@@ -190,7 +187,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         )}
 
         {/* Botão Salvar */}
-        <div className="max-w-2xl mx-auto mt-6">
+        <div className="max-w-md mx-auto mt-6">
           <Button onClick={handleSave} className="w-full bg-[#c8ff00] text-black hover:bg-[#b3e600] font-bold">
             Salvar Escalação
           </Button>
