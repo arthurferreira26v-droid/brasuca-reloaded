@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { getTeamLogo } from "@/utils/teamLogos";
 
 interface Standing {
   id: string;
@@ -139,7 +140,7 @@ export const StandingsTable = () => {
               {/* Team Name & Logo */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center p-1">
-                  <img src={team.logo} alt={team.team_name} className="w-full h-full object-contain" />
+                  <img src={getTeamLogo(team.team_name, team.logo)} alt={team.team_name} className="w-full h-full object-contain" />
                 </div>
                 <span className="font-medium text-white truncate">{team.team_name}</span>
               </div>
@@ -178,7 +179,7 @@ export const StandingsTable = () => {
               {/* Team Name & Logo */}
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center p-1">
-                  <img src={team.logo} alt={team.team_name} className="w-full h-full object-contain" />
+                  <img src={getTeamLogo(team.team_name, team.logo)} alt={team.team_name} className="w-full h-full object-contain" />
                 </div>
                 <span className="font-medium text-white truncate text-sm">{team.team_name}</span>
               </div>

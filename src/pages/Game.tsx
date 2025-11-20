@@ -8,6 +8,7 @@ import { teams } from "@/data/teams";
 import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
+import { getTeamLogo } from "@/utils/teamLogos";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
@@ -159,10 +160,10 @@ const Game = () => {
       <div className="container mx-auto px-4 py-8">
         <MatchCard
           userTeam={teamName}
-          userLogo={selectedTeam?.logo || ""}
+          userLogo={getTeamLogo(teamName, selectedTeam?.logo || "")}
           userPosition="1º"
           opponentTeam={opponentName}
-          opponentLogo={opponentLogo}
+          opponentLogo={getTeamLogo(opponentName, opponentLogo)}
           opponentPosition="8º"
           round={`${nextMatch.round}ª Rodada`}
           userForm={generateForm()}
