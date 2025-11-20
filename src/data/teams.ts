@@ -3,6 +3,7 @@ import barcelonaLogo from "@/assets/teams/barcelona.png";
 import manCityLogo from "@/assets/teams/man-city.png";
 import liverpoolLogo from "@/assets/teams/liverpool.png";
 import psgLogo from "@/assets/teams/psg.png";
+import vascoLogo from "@/assets/teams/vasco.png";
 
 export interface Team {
   id: string;
@@ -23,7 +24,7 @@ export const teams: Team[] = [
   { id: "atletico-mg", name: "Atlético Mineiro", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/5/54/Atletico_mineiro_galo.png" },
   { id: "internacional", name: "Internacional", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg" },
   { id: "botafogo", name: "Botafogo", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/5/52/Botafogo_de_Futebol_e_Regatas_logo.svg" },
-  { id: "vasco", name: "Vasco da Gama", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Vasco_da_Gama.svg" },
+  { id: "vasco", name: "Vasco da Gama", league: "brasileiro", rating: 3, logo: vascoLogo },
   { id: "fluminense", name: "Fluminense", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/a/ad/Fluminense_FC_escudo.svg" },
   { id: "cruzeiro", name: "Cruzeiro", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg" },
 
