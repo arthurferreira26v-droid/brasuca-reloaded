@@ -1,25 +1,21 @@
 import { useState } from "react";
 import { FormationField } from "@/components/FormationField";
 import { formations, playStyles } from "@/data/formations";
-import { botafogoPlayers, generateTeamPlayers } from "@/data/players";
+import { Player } from "@/data/players";
 import { ChevronDown } from "lucide-react";
 
 interface TacticsManagerProps {
   teamName: string;
+  players?: Player[];
 }
 
-export const TacticsManager = ({ teamName }: TacticsManagerProps) => {
+export const TacticsManager = ({ teamName, players = [] }: TacticsManagerProps) => {
   const [selectedFormation, setSelectedFormation] = useState("4-3-3");
   const [selectedPlayStyle, setSelectedPlayStyle] = useState("counter");
   const [openDropdown, setOpenDropdown] = useState<"style" | "formation" | null>(null);
 
   const formation = formations.find((f) => f.id === selectedFormation) || formations[0];
   const playStyle = playStyles.find((s) => s.id === selectedPlayStyle) || playStyles[0];
-  
-  // Use jogadores do Botafogo ou gere jogadores genéricos
-  const players = teamName === "Botafogo" 
-    ? botafogoPlayers 
-    : generateTeamPlayers(teamName);
 
   const toggleDropdown = (dropdown: "style" | "formation") => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);

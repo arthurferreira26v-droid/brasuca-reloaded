@@ -11,9 +11,10 @@ import { useNavigate } from "react-router-dom";
 
 interface GameMenuProps {
   teamName: string;
+  onManageSquad?: () => void;
 }
 
-export const GameMenu = ({ teamName }: GameMenuProps) => {
+export const GameMenu = ({ teamName, onManageSquad }: GameMenuProps) => {
   const navigate = useNavigate();
 
   return (
@@ -41,6 +42,7 @@ export const GameMenu = ({ teamName }: GameMenuProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
+            onClick={onManageSquad}
           >
             <Users className="h-5 w-5" />
             <span className="text-base">Gerenciar Elenco</span>
