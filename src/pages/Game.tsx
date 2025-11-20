@@ -20,9 +20,9 @@ const Game = () => {
   const generateForm = () => Array.from({ length: 4 }, () => Math.random() > 0.4);
 
   return (
-    <div className="min-h-screen bg-[#0d1b2a]">
+    <div className="min-h-screen bg-black">
       {/* Simple Header */}
-      <header className="border-b border-[#1e3a5f] bg-[#0d1b2a] backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-[#1a2c4a] bg-black backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-end">
           <GameMenu teamName={teamName} />
         </div>

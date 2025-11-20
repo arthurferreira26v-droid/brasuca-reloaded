@@ -4,6 +4,7 @@ import manCityLogo from "@/assets/teams/man-city.png";
 import liverpoolLogo from "@/assets/teams/liverpool.png";
 import psgLogo from "@/assets/teams/psg.png";
 import vascoLogo from "@/assets/teams/vasco.png";
+import santosLogo from "@/assets/teams/santos.png";
 
 export interface Team {
   id: string;
@@ -17,7 +18,7 @@ export const teams: Team[] = [
   // Brasileiro
   { id: "flamengo", name: "Flamengo", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg" },
   { id: "palmeiras", name: "Palmeiras", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg" },
-  { id: "santos", name: "Santos", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/Santos_logo.svg" },
+  { id: "santos", name: "Santos", league: "brasileiro", rating: 4, logo: santosLogo },
   { id: "sao-paulo", name: "São Paulo", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Sao_Paulo_Futebol_Clube.svg" },
   { id: "corinthians", name: "Corinthians", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Corinthians_simbolo.svg" },
   { id: "gremio", name: "Grêmio", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Gremio.svg" },
