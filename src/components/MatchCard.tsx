@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getTeamLogo } from "@/utils/teamLogos";
 
 interface MatchCardProps {
   userTeam: string;
@@ -58,7 +59,7 @@ export const MatchCard = ({
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
             <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center p-4">
-              <img src={leftLogo} alt={leftTeam} className="w-full h-full object-contain" />
+              <img src={getTeamLogo(leftTeam, leftLogo)} alt={leftTeam} className="w-full h-full object-contain" />
             </div>
             <div className="absolute -bottom-2 -right-2 bg-card rounded-full px-3 py-1 border-2 border-border">
               <span className="text-sm font-bold">{leftPosition}</span>
@@ -95,7 +96,7 @@ export const MatchCard = ({
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
             <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center p-4">
-              <img src={rightLogo} alt={rightTeam} className="w-full h-full object-contain" />
+              <img src={getTeamLogo(rightTeam, rightLogo)} alt={rightTeam} className="w-full h-full object-contain" />
             </div>
             <div className="absolute -bottom-2 -right-2 bg-card rounded-full px-3 py-1 border-2 border-border">
               <span className="text-sm font-bold">{rightPosition}</span>
