@@ -101,7 +101,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         </div>
 
         {/* Campo com titulares */}
-        <div className="relative w-full aspect-[3/4] max-w-2xl mx-auto mb-6">
+        <div className="relative w-full aspect-[3/4] max-w-2xl mx-auto mb-6 bg-[#2d5016] rounded-xl overflow-hidden">
           {/* Campo de futebol */}
           <svg viewBox="0 0 300 400" className="w-full h-full">
             {/* Fundo verde */}
@@ -112,13 +112,13 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
             <circle cx="150" cy="200" r="50" fill="none" stroke="white" strokeWidth="2" />
             <circle cx="150" cy="200" r="3" fill="white" />
             
-            {/* Área superior */}
-            <rect x="75" y="0" width="150" height="60" fill="none" stroke="white" strokeWidth="2" />
-            <rect x="120" y="0" width="60" height="25" fill="none" stroke="white" strokeWidth="2" />
+            {/* Área superior com bordas arredondadas */}
+            <rect x="75" y="0" width="150" height="60" fill="none" stroke="white" strokeWidth="2" rx="8" />
+            <rect x="120" y="0" width="60" height="25" fill="none" stroke="white" strokeWidth="2" rx="6" />
             
-            {/* Área inferior */}
-            <rect x="75" y="340" width="150" height="60" fill="none" stroke="white" strokeWidth="2" />
-            <rect x="120" y="375" width="60" height="25" fill="none" stroke="white" strokeWidth="2" />
+            {/* Área inferior com bordas arredondadas */}
+            <rect x="75" y="340" width="150" height="60" fill="none" stroke="white" strokeWidth="2" rx="8" />
+            <rect x="120" y="375" width="60" height="25" fill="none" stroke="white" strokeWidth="2" rx="6" />
           </svg>
 
           {/* Posicionar jogadores */}
