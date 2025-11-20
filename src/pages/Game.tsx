@@ -2,7 +2,6 @@ import { useSearchParams } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
 import { teams } from "@/data/teams";
-import { Trophy } from "lucide-react";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
@@ -21,11 +20,10 @@ const Game = () => {
   const generateForm = () => Array.from({ length: 4 }, () => Math.random() > 0.4);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0d1b2a]">
       {/* Simple Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Trophy className="h-6 w-6 text-primary" />
+      <header className="border-b border-[#1e3a5f] bg-[#0d1b2a] backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-end">
           <GameMenu teamName={teamName} />
         </div>
       </header>
