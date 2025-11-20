@@ -42,15 +42,19 @@ const Game = () => {
     );
   }
 
-  if (!nextMatch) {
+  if (!nextMatch && !loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Campeonato Finalizado!</h2>
-          <p className="text-muted-foreground">Todas as partidas foram jogadas.</p>
+          <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00] mb-4 mx-auto" />
+          <p className="text-muted-foreground">Preparando novo campeonato...</p>
         </div>
       </div>
     );
+  }
+
+  if (!nextMatch) {
+    return null;
   }
 
   return (
