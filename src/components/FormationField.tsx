@@ -1,0 +1,62 @@
+import { Player } from "@/data/players";
+import { Formation } from "@/data/formations";
+
+interface FormationFieldProps {
+  formation: Formation;
+  players: Player[];
+}
+
+export const FormationField = ({ formation, players }: FormationFieldProps) => {
+  return (
+    <div className="relative w-full aspect-[3/4] bg-gradient-to-b from-green-800 to-green-900 rounded-lg overflow-hidden border-2 border-white/20">
+      {/* Campo de futebol - linhas */}
+      <svg className="absolute inset-0 w-full h-full opacity-30" xmlns="http://www.w3.org/2000/svg">
+        {/* Linha do meio */}
+        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="white" strokeWidth="2" />
+        {/* Círculo central */}
+        <circle cx="50%" cy="50%" r="60" fill="none" stroke="white" strokeWidth="2" />
+        <circle cx="50%" cy="50%" r="4" fill="white" />
+        {/* Área grande de cima */}
+        <rect x="25%" y="2%" width="50%" height="18%" fill="none" stroke="white" strokeWidth="2" />
+        {/* Área pequena de cima */}
+        <rect x="35%" y="2%" width="30%" height="10%" fill="none" stroke="white" strokeWidth="2" />
+        {/* Área grande de baixo */}
+        <rect x="25%" y="80%" width="50%" height="18%" fill="none" stroke="white" strokeWidth="2" />
+        {/* Área pequena de baixo */}
+        <rect x="35%" y="88%" width="30%" height="10%" fill="none" stroke="white" strokeWidth="2" />
+      </svg>
+
+      {/* Jogadores */}
+      {formation.positions.map((pos, index) => {
+        const player = players[index];
+        if (!player) return null;
+
+        return (
+          <div
+            key={player.id}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1"
+            style={{
+              left: `${pos.x}%`,
+              top: `${pos.y}%`,
+            }}
+          >
+            {/* Círculo do jogador */}
+            <div className="relative">
+              <div className="w-10 h-10 bg-black border-2 border-white rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-xs font-bold">{player.number}</span>
+              </div>
+              {/* Overall rating */}
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#c8ff00] rounded-full flex items-center justify-center">
+                <span className="text-black text-[10px] font-bold">{player.overall}</span>
+              </div>
+            </div>
+            {/* Nome do jogador */}
+            <div className="bg-black/70 px-2 py-0.5 rounded text-white text-[10px] font-medium whitespace-nowrap">
+              {player.name}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
