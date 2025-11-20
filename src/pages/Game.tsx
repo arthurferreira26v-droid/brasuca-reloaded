@@ -22,10 +22,10 @@ const Game = () => {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Button>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Trophy className="h-6 w-6 text-primary" />
-            {teamName}
-          </h1>
+            <h1 className="text-2xl font-bold text-foreground">{teamName}</h1>
+          </div>
           <div className="w-24" /> {/* Spacer for alignment */}
         </div>
       </header>
