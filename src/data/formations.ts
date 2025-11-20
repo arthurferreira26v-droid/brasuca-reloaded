@@ -40,9 +40,9 @@ export const formations: Formation[] = [
       { x: 35, y: 55, role: "VOL" },
       { x: 50, y: 50, role: "MC" },
       { x: 65, y: 55, role: "VOL" },
-      { x: 20, y: 20, role: "PD" },
+      { x: 20, y: 20, role: "PE" },
       { x: 50, y: 15, role: "ATA" },
-      { x: 80, y: 20, role: "PE" },
+      { x: 80, y: 20, role: "PD" },
     ],
   },
   {
