@@ -18,8 +18,8 @@ const Game = () => {
   );
   const opponent = brazilianTeams[Math.floor(Math.random() * brazilianTeams.length)];
 
-  // Generate random form (últimos 4 jogos)
-  const generateForm = () => Array.from({ length: 4 }, () => Math.random() > 0.4);
+  // Generate random form (últimos 5 jogos)
+  const generateForm = () => Array.from({ length: 5 }, () => Math.random() > 0.4);
 
   return (
     <div className="min-h-screen bg-black">

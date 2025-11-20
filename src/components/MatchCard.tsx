@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle } from "lucide-react";
 
 interface MatchCardProps {
   homeTeam: string;
@@ -47,11 +46,16 @@ export const MatchCard = ({
           </div>
           <div className="flex gap-1">
             {homeForm.map((win, i) => (
-              win ? (
-                <CheckCircle2 key={i} className="h-5 w-5 text-primary fill-primary" />
-              ) : (
-                <XCircle key={i} className="h-5 w-5 text-destructive fill-destructive" />
-              )
+              <div 
+                key={i} 
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  win 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-red-600 text-white'
+                }`}
+              >
+                {win ? '✓' : 'X'}
+              </div>
             ))}
           </div>
         </div>
@@ -70,11 +74,16 @@ export const MatchCard = ({
           </div>
           <div className="flex gap-1">
             {awayForm.map((win, i) => (
-              win ? (
-                <CheckCircle2 key={i} className="h-5 w-5 text-primary fill-primary" />
-              ) : (
-                <XCircle key={i} className="h-5 w-5 text-destructive fill-destructive" />
-              )
+              <div 
+                key={i} 
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  win 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-red-600 text-white'
+                }`}
+              >
+                {win ? '✓' : 'X'}
+              </div>
             ))}
           </div>
         </div>
