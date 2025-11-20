@@ -6,13 +6,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, TrendingUp, Briefcase, Calendar } from "lucide-react";
+import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface GameMenuProps {
   teamName: string;
 }
 
 export const GameMenu = ({ teamName }: GameMenuProps) => {
+  const navigate = useNavigate();
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -26,6 +29,15 @@ export const GameMenu = ({ teamName }: GameMenuProps) => {
         </SheetHeader>
         
         <div className="mt-8 space-y-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 h-14"
+            onClick={() => navigate("/classificacao")}
+          >
+            <Trophy className="h-5 w-5" />
+            <span className="text-base">Classificação</span>
+          </Button>
+
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
