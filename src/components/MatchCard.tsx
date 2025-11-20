@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface MatchCardProps {
   homeTeam: string;
@@ -24,6 +25,12 @@ export const MatchCard = ({
   homeForm,
   awayForm,
 }: MatchCardProps) => {
+  const navigate = useNavigate();
+
+  const handlePlayMatch = () => {
+    navigate(`/partida?time=${awayTeam}&adversario=${homeTeam}`);
+  };
+
   return (
     <Card className="bg-[#050B2B] border-[#0a1540] p-8 max-w-2xl mx-auto">
       <div className="text-center mb-6">
@@ -89,7 +96,10 @@ export const MatchCard = ({
         </div>
       </div>
 
-      <Button className="w-full h-14 text-lg font-bold bg-[#c8ff00] hover:bg-[#b3e600] text-black">
+      <Button 
+        onClick={handlePlayMatch}
+        className="w-full h-14 text-lg font-bold bg-[#c8ff00] hover:bg-[#b3e600] text-black"
+      >
         JOGAR
       </Button>
     </Card>
