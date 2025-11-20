@@ -14,7 +14,151 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      championships: {
+        Row: {
+          created_at: string
+          current_round: number
+          id: string
+          name: string
+          season: string
+          total_rounds: number
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number
+          id?: string
+          name: string
+          season: string
+          total_rounds: number
+        }
+        Update: {
+          created_at?: string
+          current_round?: number
+          id?: string
+          name?: string
+          season?: string
+          total_rounds?: number
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          away_score: number | null
+          away_team_id: string
+          away_team_logo: string
+          away_team_name: string
+          championship_id: string
+          created_at: string
+          home_score: number | null
+          home_team_id: string
+          home_team_logo: string
+          home_team_name: string
+          id: string
+          is_played: boolean
+          round: number
+        }
+        Insert: {
+          away_score?: number | null
+          away_team_id: string
+          away_team_logo: string
+          away_team_name: string
+          championship_id: string
+          created_at?: string
+          home_score?: number | null
+          home_team_id: string
+          home_team_logo: string
+          home_team_name: string
+          id?: string
+          is_played?: boolean
+          round: number
+        }
+        Update: {
+          away_score?: number | null
+          away_team_id?: string
+          away_team_logo?: string
+          away_team_name?: string
+          championship_id?: string
+          created_at?: string
+          home_score?: number | null
+          home_team_id?: string
+          home_team_logo?: string
+          home_team_name?: string
+          id?: string
+          is_played?: boolean
+          round?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_championship_id_fkey"
+            columns: ["championship_id"]
+            isOneToOne: false
+            referencedRelation: "championships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standings: {
+        Row: {
+          championship_id: string
+          created_at: string
+          draws: number
+          goal_difference: number
+          goals_against: number
+          goals_for: number
+          id: string
+          logo: string
+          losses: number
+          played: number
+          points: number
+          position: number
+          team_id: string
+          team_name: string
+          wins: number
+        }
+        Insert: {
+          championship_id: string
+          created_at?: string
+          draws?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          logo: string
+          losses?: number
+          played?: number
+          points?: number
+          position?: number
+          team_id: string
+          team_name: string
+          wins?: number
+        }
+        Update: {
+          championship_id?: string
+          created_at?: string
+          draws?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          logo?: string
+          losses?: number
+          played?: number
+          points?: number
+          position?: number
+          team_id?: string
+          team_name?: string
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standings_championship_id_fkey"
+            columns: ["championship_id"]
+            isOneToOne: false
+            referencedRelation: "championships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
