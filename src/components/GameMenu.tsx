@@ -6,7 +6,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy } from "lucide-react";
+import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GameMenuProps {
@@ -69,6 +69,17 @@ export const GameMenu = ({ teamName }: GameMenuProps) => {
             <Briefcase className="h-5 w-5" />
             <span className="text-base">Finanças</span>
           </Button>
+
+          <div className="pt-4 mt-4 border-t border-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-14 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+              onClick={() => navigate("/")}
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="text-base font-semibold">Sair</span>
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
