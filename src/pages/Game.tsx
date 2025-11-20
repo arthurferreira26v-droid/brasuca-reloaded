@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
+import { SquadManager } from "@/components/SquadManager";
 import { teams } from "@/data/teams";
+import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
 
@@ -10,6 +13,13 @@ const Game = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const teamName = searchParams.get("time") || "Seu Time";
+  const [showSquadManager, setShowSquadManager] = useState(false);
+  
+  // Initialize players state
+  const initialPlayers = teamName === "Botafogo" 
+    ? botafogoPlayers 
+    : generateTeamPlayers(teamName);
+  const [players, setPlayers] = useState<Player[]>(initialPlayers);
 
   // Find the selected team
   const selectedTeam = teams.find(t => t.name === teamName);
@@ -123,7 +133,7 @@ const Game = () => {
           </div>
 
           {/* Menu hamburguer - direita */}
-          <GameMenu teamName={teamName} />
+          <GameMenu teamName={teamName} onManageSquad={() => setShowSquadManager(true)} />
         </div>
 
         {/* Menu horizontal de times */}
@@ -163,8 +173,17 @@ const Game = () => {
 
       {/* Tactics Manager Section */}
       <div className="container mx-auto px-4 pb-12 pt-8">
-        <TacticsManager teamName={teamName} />
+        <TacticsManager teamName={teamName} players={players.filter(p => p.isStarter)} />
       </div>
+
+      {/* Squad Manager Modal */}
+      {showSquadManager && (
+        <SquadManager
+          players={players}
+          onClose={() => setShowSquadManager(false)}
+          onSquadChange={(updatedPlayers) => setPlayers(updatedPlayers)}
+        />
+      )}
     </div>
   );
 };
