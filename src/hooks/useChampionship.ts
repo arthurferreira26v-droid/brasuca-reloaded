@@ -125,11 +125,33 @@ export const useChampionship = (userTeamName: string) => {
         if (fetchError) throw fetchError;
 
         let championshipId: string;
+        let needsReset = false;
 
         if (existingChampionships && existingChampionships.length > 0) {
           championshipId = existingChampionships[0].id;
-          setChampionship(existingChampionships[0]);
-        } else {
+          
+          // Verificar se todas as partidas foram jogadas
+          const { data: remainingMatches } = await supabase
+            .from("matches")
+            .select("id")
+            .eq("championship_id", championshipId)
+            .eq("is_played", false)
+            .limit(1);
+          
+          // Se não há partidas restantes, resetar campeonato
+          if (!remainingMatches || remainingMatches.length === 0) {
+            needsReset = true;
+            
+            // Deletar campeonato atual e dados relacionados
+            await supabase.from("matches").delete().eq("championship_id", championshipId);
+            await supabase.from("standings").delete().eq("championship_id", championshipId);
+            await supabase.from("championships").delete().eq("id", championshipId);
+          } else {
+            setChampionship(existingChampionships[0]);
+          }
+        }
+
+        if (!existingChampionships || existingChampionships.length === 0 || needsReset) {
           const { data: newChampionship, error: createError } = await supabase
             .from("championships")
             .insert({
@@ -139,7 +161,7 @@ export const useChampionship = (userTeamName: string) => {
               total_rounds: (brazilianTeams.length - 1) * 2,
             })
             .select()
-            .single();
+            .maybeSingle();
 
           if (createError) throw createError;
           if (!newChampionship) throw new Error("Falha ao criar campeonato");
