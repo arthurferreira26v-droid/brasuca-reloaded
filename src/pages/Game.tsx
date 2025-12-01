@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
 import { SquadManager } from "@/components/SquadManager";
+import { TeamBudget } from "@/components/TeamBudget";
 import { teams } from "@/data/teams";
 import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
 import { useTeamForm } from "@/hooks/useTeamForm";
+import { useTeamBudget } from "@/hooks/useTeamBudget";
 import { getTeamLogo } from "@/utils/teamLogos";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const teamName = searchParams.get("time") || "Seu Time";
   const [showSquadManager, setShowSquadManager] = useState(false);
   
@@ -29,11 +30,6 @@ const Game = () => {
   // Get championship data
   const { championship, nextMatch, loading, isChampionComplete, userWonChampionship, resetChampionship } = useChampionship(teamName);
   
-  // Get Brazilian teams for the menu
-  const brazilianTeams = teams.filter(
-    t => t.league === "brasileiro" && t.name !== teamName
-  );
-  
   // Determine if user is home or away based on match data
   const isHome = nextMatch ? nextMatch.home_team_name === teamName : false;
   const opponentName = nextMatch 
@@ -46,8 +42,11 @@ const Game = () => {
   // Buscar os últimos 5 resultados reais de cada time
   const { form: userForm, loading: userFormLoading } = useTeamForm(teamName, championship?.id);
   const { form: opponentForm, loading: opponentFormLoading } = useTeamForm(opponentName, championship?.id);
+  
+  // Buscar o budget do time
+  const { budget, loading: budgetLoading } = useTeamBudget(teamName, championship?.id);
 
-  if (loading || userFormLoading || opponentFormLoading) {
+  if (loading || userFormLoading || opponentFormLoading || budgetLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
@@ -139,23 +138,8 @@ const Game = () => {
           <GameMenu teamName={teamName} onManageSquad={() => setShowSquadManager(true)} />
         </div>
 
-        {/* Menu horizontal de times */}
-        <div className="border-t border-[#1a2c4a] bg-black">
-          <div className="container mx-auto px-4 py-3 flex items-center gap-3 overflow-x-auto scrollbar-hide">
-            {brazilianTeams.slice(0, 6).map((team) => (
-              <button
-                key={team.id}
-                onClick={() => navigate(`/jogo?time=${team.name}`)}
-                className="flex-shrink-0 w-14 h-14 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center p-2 transition-colors border border-white/10"
-              >
-                <img src={team.logo} alt={team.name} className="w-full h-full object-contain" />
-              </button>
-            ))}
-            <button className="flex-shrink-0 w-14 h-14 bg-[#c8ff00] rounded-lg flex items-center justify-center transition-colors">
-              <ChevronRight className="w-6 h-6 text-black" />
-            </button>
-          </div>
-        </div>
+        {/* Caixa do Time */}
+        <TeamBudget budget={budget} />
       </header>
 
       {/* Match Section */}
