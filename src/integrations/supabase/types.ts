@@ -159,6 +159,44 @@ export type Database = {
           },
         ]
       }
+      team_budgets: {
+        Row: {
+          budget: number
+          championship_id: string
+          created_at: string
+          id: string
+          team_id: string
+          team_name: string
+          updated_at: string
+        }
+        Insert: {
+          budget?: number
+          championship_id: string
+          created_at?: string
+          id?: string
+          team_id: string
+          team_name: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: number
+          championship_id?: string
+          created_at?: string
+          id?: string
+          team_id?: string
+          team_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_budgets_championship_id_fkey"
+            columns: ["championship_id"]
+            isOneToOne: false
+            referencedRelation: "championships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
