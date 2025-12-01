@@ -12,8 +12,8 @@ export const FormationField = ({ formation, players }: FormationFieldProps) => {
     // Mapeia os roles da formação para as posições dos jogadores
     const positionMap: { [key: string]: string[] } = {
       GOL: ["GOL"],
-      LD: ["LD"],
       LE: ["LE"],
+      LD: ["LD"],
       ZAG: ["ZAG"],
       VOL: ["VOL"],
       MC: ["MC", "VOL"], // MC pode usar VOL se não houver MC
@@ -22,8 +22,8 @@ export const FormationField = ({ formation, players }: FormationFieldProps) => {
       ATA: ["ATA"],
       MD: ["PD", "MC"], // Meio direito pode usar PD ou MC
       ME: ["PE", "MC"], // Meio esquerdo pode usar PE ou MC
-      ALD: ["LD"], // Ala direito usa lateral direito
       ALE: ["LE"], // Ala esquerdo usa lateral esquerdo
+      ALD: ["LD"], // Ala direito usa lateral direito
     };
 
     const positions = positionMap[role] || [role];

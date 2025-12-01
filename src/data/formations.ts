@@ -16,10 +16,10 @@ export const formations: Formation[] = [
     name: "4-4-2",
     positions: [
       { x: 50, y: 95, role: "GOL" }, // Goleiro
-      { x: 20, y: 75, role: "LD" },  // Lateral Direito
+      { x: 20, y: 75, role: "LE" },  // Lateral Esquerdo
       { x: 40, y: 75, role: "ZAG" }, // Zagueiro
       { x: 60, y: 75, role: "ZAG" }, // Zagueiro
-      { x: 80, y: 75, role: "LE" },  // Lateral Esquerdo
+      { x: 80, y: 75, role: "LD" },  // Lateral Direito
       { x: 20, y: 50, role: "MD" },  // Meio Direito
       { x: 40, y: 50, role: "MC" },  // Meio Central
       { x: 60, y: 50, role: "MC" },  // Meio Central
@@ -33,10 +33,10 @@ export const formations: Formation[] = [
     name: "4-3-3",
     positions: [
       { x: 50, y: 95, role: "GOL" },
-      { x: 20, y: 75, role: "LD" },
+      { x: 20, y: 75, role: "LE" },
       { x: 40, y: 75, role: "ZAG" },
       { x: 60, y: 75, role: "ZAG" },
-      { x: 80, y: 75, role: "LE" },
+      { x: 80, y: 75, role: "LD" },
       { x: 35, y: 55, role: "VOL" },
       { x: 50, y: 50, role: "MC" },
       { x: 65, y: 55, role: "VOL" },
@@ -53,11 +53,11 @@ export const formations: Formation[] = [
       { x: 30, y: 75, role: "ZAG" },
       { x: 50, y: 75, role: "ZAG" },
       { x: 70, y: 75, role: "ZAG" },
-      { x: 15, y: 55, role: "ALD" },
+      { x: 15, y: 55, role: "ALE" },
       { x: 35, y: 50, role: "MC" },
       { x: 50, y: 45, role: "VOL" },
       { x: 65, y: 50, role: "MC" },
-      { x: 85, y: 55, role: "ALE" },
+      { x: 85, y: 55, role: "ALD" },
       { x: 40, y: 20, role: "ATA" },
       { x: 60, y: 20, role: "ATA" },
     ],
