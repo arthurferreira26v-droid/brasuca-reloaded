@@ -37,6 +37,7 @@ export const botafogoPlayers: Player[] = [
   { id: "10", name: "Savarino", number: 10, position: "MC", overall: 83, isStarter: true },
   { id: "23", name: "Santi Rodríguez", number: 23, position: "MC", overall: 75, isStarter: false },
   { id: "8", name: "Álvaro Montoro", number: 8, position: "MC", overall: 73, isStarter: false },
+  { id: "14", name: "Jordan Barrera", number: 14, position: "MC", overall: 79, isStarter: false },
   
   // Pontas
   { id: "7", name: "Artur", number: 7, position: "PD", overall: 78, isStarter: true },
@@ -49,6 +50,47 @@ export const botafogoPlayers: Player[] = [
   { id: "98", name: "Arthur Cabral", number: 98, position: "ATA", overall: 84, isStarter: true },
   { id: "39", name: "Gonzalo Mastriani", number: 39, position: "ATA", overall: 75, isStarter: false },
   { id: "9", name: "Chris Ramos", number: 9, position: "ATA", overall: 74, isStarter: false },
+];
+
+// Escalação completa do Flamengo
+export const flamengoPlayers: Player[] = [
+  // Goleiros
+  { id: "f1", name: "Rossi", number: 1, position: "GOL", overall: 83, isStarter: true },
+  { id: "f12", name: "Matheus Cunha", number: 12, position: "GOL", overall: 76, isStarter: false },
+  { id: "f25", name: "Dyogo Alves", number: 25, position: "GOL", overall: 74, isStarter: false },
+  
+  // Laterais
+  { id: "f2", name: "Wesley", number: 2, position: "LD", overall: 80, isStarter: true },
+  { id: "f13", name: "Varela", number: 13, position: "LD", overall: 78, isStarter: false },
+  { id: "f6", name: "Alex Sandro", number: 6, position: "LE", overall: 84, isStarter: true },
+  { id: "f16", name: "Ayrton Lucas", number: 16, position: "LE", overall: 79, isStarter: false },
+  
+  // Zagueiros
+  { id: "f4", name: "Léo Pereira", number: 4, position: "ZAG", overall: 82, isStarter: true },
+  { id: "f3", name: "Léo Ortiz", number: 3, position: "ZAG", overall: 81, isStarter: true },
+  { id: "f15", name: "Fabrício Bruno", number: 15, position: "ZAG", overall: 80, isStarter: false },
+  { id: "f34", name: "David Luiz", number: 34, position: "ZAG", overall: 79, isStarter: false },
+  
+  // Volantes
+  { id: "f5", name: "Erick Pulgar", number: 5, position: "VOL", overall: 82, isStarter: true },
+  { id: "f21", name: "Allan", number: 21, position: "VOL", overall: 78, isStarter: false },
+  { id: "f29", name: "Evertton Araújo", number: 29, position: "VOL", overall: 75, isStarter: false },
+  
+  // Meias
+  { id: "f8", name: "Gerson", number: 8, position: "MC", overall: 86, isStarter: true },
+  { id: "f14", name: "Arrascaeta", number: 14, position: "MC", overall: 87, isStarter: true },
+  { id: "f18", name: "Alcaraz", number: 18, position: "MC", overall: 77, isStarter: false },
+  
+  // Pontas
+  { id: "f22", name: "Samuel Lino", number: 22, position: "PE", overall: 81, isStarter: true },
+  { id: "f11", name: "Everton Cebolinha", number: 11, position: "PE", overall: 80, isStarter: false },
+  { id: "f7", name: "Luiz Araújo", number: 7, position: "PD", overall: 82, isStarter: false },
+  { id: "f27", name: "Bruno Henrique", number: 27, position: "PD", overall: 83, isStarter: true },
+  
+  // Atacantes
+  { id: "f10", name: "Gabigol", number: 10, position: "ATA", overall: 88, isStarter: true },
+  { id: "f9", name: "Pedro", number: 9, position: "ATA", overall: 85, isStarter: false },
+  { id: "f99", name: "Carlinhos", number: 99, position: "ATA", overall: 76, isStarter: false },
 ];
 
 // Jogadores de outros times (exemplo genérico)
