@@ -220,6 +220,25 @@ const Match = () => {
         }
       }
 
+      // Reordenar classificação por pontos, saldo de gols e gols marcados
+      const { data: finalStandings } = await supabase
+        .from("standings")
+        .select("*")
+        .eq("championship_id", championship.id)
+        .order("points", { ascending: false })
+        .order("goal_difference", { ascending: false })
+        .order("goals_for", { ascending: false });
+
+      // Atualizar posições de todos os times
+      if (finalStandings) {
+        for (let i = 0; i < finalStandings.length; i++) {
+          await supabase
+            .from("standings")
+            .update({ position: i + 1 })
+            .eq("id", finalStandings[i].id);
+        }
+      }
+
       // Atualizar rodada atual do campeonato
       await supabase
         .from("championships")
