@@ -87,6 +87,10 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
       onClick={onClick}
     >
       <div className="relative">
+        {/* Overall - bolinha vermelha acima */}
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xs z-10">
+          {player.overall}
+        </div>
         <div className={`w-12 h-12 rounded-full bg-white border-2 ${
           selectedReserve?.id === player.id ? 'border-[#c8ff00]' : 'border-white'
         } flex items-center justify-center text-black font-bold text-lg`}>

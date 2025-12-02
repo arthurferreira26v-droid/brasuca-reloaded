@@ -6,7 +6,7 @@ import { TacticsManager } from "@/components/TacticsManager";
 import { SquadManager } from "@/components/SquadManager";
 import { TeamBudget } from "@/components/TeamBudget";
 import { teams } from "@/data/teams";
-import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
+import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
 import { useTeamForm } from "@/hooks/useTeamForm";
@@ -21,6 +21,8 @@ const Game = () => {
   // Initialize players state
   const initialPlayers = teamName === "Botafogo" 
     ? botafogoPlayers 
+    : teamName === "Flamengo"
+    ? flamengoPlayers
     : generateTeamPlayers(teamName);
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
 
