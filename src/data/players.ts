@@ -37,11 +37,11 @@ export const botafogoPlayers: Player[] = [
   { id: "10", name: "Savarino", number: 10, position: "MC", overall: 83, isStarter: true },
   { id: "23", name: "Santi Rodríguez", number: 23, position: "MC", overall: 75, isStarter: false },
   { id: "8", name: "Álvaro Montoro", number: 8, position: "MC", overall: 73, isStarter: false },
-  { id: "14", name: "Jordan Barrera", number: 14, position: "MC", overall: 79, isStarter: false },
   
   // Pontas
   { id: "7", name: "Artur", number: 7, position: "PD", overall: 78, isStarter: true },
   { id: "11", name: "Matheus Martins", number: 11, position: "PD", overall: 77, isStarter: false },
+  { id: "14", name: "Jordan Barrera", number: 14, position: "PD", overall: 79, isStarter: false },
   { id: "47", name: "Jeffinho", number: 47, position: "PE", overall: 76, isStarter: false },
   { id: "16", name: "Nathan Fernandes", number: 16, position: "PD", overall: 74, isStarter: false },
   { id: "19", name: "Joaquin Correa", number: 19, position: "PE", overall: 79, isStarter: true },
