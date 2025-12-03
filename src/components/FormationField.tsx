@@ -80,7 +80,7 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
           >
             {/* Círculo do jogador */}
             <div className="relative">
-              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-green-800 flex items-center justify-center text-white text-[10px] font-bold z-10">
+              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[hsl(var(--overall-blue))] flex items-center justify-center text-white text-[10px] font-bold z-10">
                 {player.overall}
               </div>
               <div className="w-10 h-10 bg-black border-2 border-white rounded-full flex items-center justify-center shadow-lg">

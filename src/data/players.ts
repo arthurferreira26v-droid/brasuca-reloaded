@@ -88,8 +88,7 @@ export const flamengoPlayers: Player[] = [
   { id: "f27", name: "Bruno Henrique", number: 27, position: "PD", overall: 83, isStarter: true },
   
   // Atacantes
-  { id: "f10", name: "Gabigol", number: 10, position: "ATA", overall: 88, isStarter: true },
-  { id: "f9", name: "Pedro", number: 9, position: "ATA", overall: 85, isStarter: false },
+  { id: "f9", name: "Pedro", number: 9, position: "ATA", overall: 85, isStarter: true },
   { id: "f99", name: "Carlinhos", number: 99, position: "ATA", overall: 76, isStarter: false },
 ];
 
