@@ -88,7 +88,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
     >
       <div className="relative">
         {/* Overall - bolinha verde no canto superior direito */}
-        <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-xs z-10">
+        <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-green-800 flex items-center justify-center text-white font-bold text-xs z-10">
           {player.overall}
         </div>
         <div className={`w-12 h-12 rounded-full bg-white border-2 ${
