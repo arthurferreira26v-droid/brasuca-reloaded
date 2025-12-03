@@ -3,6 +3,7 @@ import { Player } from "@/data/players";
 import { formations, playStyles } from "@/data/formations";
 import { X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormationField } from "@/components/FormationField";
 
 interface SquadManagerProps {
   players: Player[];
@@ -60,47 +61,7 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
 
-  // Organizar titulares por posição para o campo
-  const getStartersByPosition = (position: string) => {
-    return starters.filter(p => p.position === position);
-  };
 
-  const goalkeeper = getStartersByPosition("GOL")[0];
-  const defenders = [
-    ...getStartersByPosition("LE"),
-    ...getStartersByPosition("ZAG"),
-    ...getStartersByPosition("LD"),
-  ];
-  const midfielders = [
-    ...getStartersByPosition("VOL"),
-    ...getStartersByPosition("MC"),
-  ];
-  const forwards = [
-    ...getStartersByPosition("PE"),
-    ...getStartersByPosition("ATA"),
-    ...getStartersByPosition("PD"),
-  ];
-
-  const PlayerCircle = ({ player, onClick, isClickable }: { player: Player; onClick?: () => void; isClickable?: boolean }) => (
-    <div 
-      className={`flex flex-col items-center ${isClickable ? 'cursor-pointer' : ''}`}
-      onClick={onClick}
-    >
-      <div className="relative">
-        {/* Overall - bolinha verde no canto superior direito */}
-        <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-green-800 flex items-center justify-center text-white font-bold text-xs z-10">
-          {player.overall}
-        </div>
-        <div className={`w-12 h-12 rounded-full bg-white border-2 ${
-          selectedReserve?.id === player.id ? 'border-[#c8ff00]' : 'border-white'
-        } flex items-center justify-center text-black font-bold text-lg`}>
-          {player.number}
-        </div>
-      </div>
-      <span className="mt-1 text-white text-xs bg-black/70 px-2 py-0.5 rounded">{player.name}</span>
-      <span className="text-white text-[10px] bg-black/70 px-2 py-0.5 rounded mt-0.5 font-semibold">{player.position}</span>
-    </div>
-  );
 
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-y-auto">
@@ -114,56 +75,13 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
         </div>
 
         {/* Campo com titulares */}
-        <div className="relative w-full max-w-md mx-auto mb-4 bg-[#1a4d2e] rounded-xl overflow-hidden" style={{ height: '550px' }}>
-          {/* Campo de futebol */}
-          <svg viewBox="0 0 300 400" className="w-full h-full">
-            {/* Fundo verde */}
-            <rect width="300" height="400" fill="#1a4d2e" />
-            
-            {/* Linhas do campo */}
-            <line x1="0" y1="200" x2="300" y2="200" stroke="white" strokeWidth="2" />
-            <circle cx="150" cy="200" r="50" fill="none" stroke="white" strokeWidth="2" />
-            <circle cx="150" cy="200" r="3" fill="white" />
-            
-            {/* Área superior com bordas arredondadas */}
-            <rect x="75" y="0" width="150" height="60" fill="none" stroke="white" strokeWidth="2" rx="8" />
-            <rect x="120" y="0" width="60" height="25" fill="none" stroke="white" strokeWidth="2" rx="6" />
-            
-            {/* Área inferior com bordas arredondadas */}
-            <rect x="75" y="340" width="150" height="60" fill="none" stroke="white" strokeWidth="2" rx="8" />
-            <rect x="120" y="375" width="60" height="25" fill="none" stroke="white" strokeWidth="2" rx="6" />
-          </svg>
-
-          {/* Posicionar jogadores */}
-          <div className="absolute inset-0">
-            {/* Goleiro */}
-            {goalkeeper && (
-              <div className="absolute" style={{ bottom: '3%', left: '50%', transform: 'translateX(-50%)' }}>
-                <PlayerCircle player={goalkeeper} onClick={() => handleStarterClick(goalkeeper)} isClickable={!!selectedReserve} />
-              </div>
-            )}
-
-            {/* Defensores */}
-            <div className="absolute flex justify-around items-center w-full px-8" style={{ bottom: '20%' }}>
-              {defenders.map(player => (
-                <PlayerCircle key={player.id} player={player} onClick={() => handleStarterClick(player)} isClickable={!!selectedReserve} />
-              ))}
-            </div>
-
-            {/* Meio-campistas */}
-            <div className="absolute flex justify-around items-center w-full px-8" style={{ bottom: '45%' }}>
-              {midfielders.map(player => (
-                <PlayerCircle key={player.id} player={player} onClick={() => handleStarterClick(player)} isClickable={!!selectedReserve} />
-              ))}
-            </div>
-
-            {/* Atacantes */}
-            <div className="absolute flex justify-around items-center w-full px-8" style={{ bottom: '70%' }}>
-              {forwards.map(player => (
-                <PlayerCircle key={player.id} player={player} onClick={() => handleStarterClick(player)} isClickable={!!selectedReserve} />
-              ))}
-            </div>
-          </div>
+        <div className="w-full max-w-md mx-auto mb-4">
+          <FormationField
+            formation={formation}
+            players={starters}
+            onPlayerClick={handleStarterClick}
+            canSubstitute={!!selectedReserve}
+          />
         </div>
 
         {/* Dropdowns de Estilo e Formação */}
