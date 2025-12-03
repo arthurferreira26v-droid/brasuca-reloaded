@@ -4,9 +4,11 @@ import { Formation } from "@/data/formations";
 interface FormationFieldProps {
   formation: Formation;
   players: Player[];
+  onPlayerClick?: (player: Player) => void;
+  canSubstitute?: boolean;
 }
 
-export const FormationField = ({ formation, players }: FormationFieldProps) => {
+export const FormationField = ({ formation, players, onPlayerClick, canSubstitute = false }: FormationFieldProps) => {
   // Mapeia jogadores para posições da formação
   const getPlayerForPosition = (role: string) => {
     // Mapeia os roles da formação para as posições dos jogadores
@@ -69,11 +71,12 @@ export const FormationField = ({ formation, players }: FormationFieldProps) => {
         return (
           <div
             key={`${player.id}-${index}`}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1"
+            className={`absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 ${canSubstitute && onPlayerClick ? "cursor-pointer" : ""}`}
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
             }}
+            onClick={canSubstitute && onPlayerClick ? () => onPlayerClick(player) : undefined}
           >
             {/* Círculo do jogador */}
             <div className="relative">
