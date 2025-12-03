@@ -7,9 +7,11 @@ import { ChevronDown } from "lucide-react";
 interface TacticsManagerProps {
   teamName: string;
   players?: Player[];
+  onStarterClick?: (player: Player) => void;
+  canSubstitute?: boolean;
 }
 
-export const TacticsManager = ({ teamName, players = [] }: TacticsManagerProps) => {
+export const TacticsManager = ({ teamName, players = [], onStarterClick, canSubstitute = false }: TacticsManagerProps) => {
   const [selectedFormation, setSelectedFormation] = useState("4-3-3");
   const [selectedPlayStyle, setSelectedPlayStyle] = useState("counter");
   const [openDropdown, setOpenDropdown] = useState<"style" | "formation" | null>(null);
@@ -24,7 +26,12 @@ export const TacticsManager = ({ teamName, players = [] }: TacticsManagerProps) 
   return (
     <div className="bg-black p-4 md:p-6">
       {/* Campo */}
-      <FormationField formation={formation} players={players} />
+      <FormationField
+        formation={formation}
+        players={players}
+        onPlayerClick={onStarterClick}
+        canSubstitute={canSubstitute}
+      />
 
       {/* Botões de Estilo de Jogo e Tática */}
       <div className="grid grid-cols-2 gap-4 mt-6">
