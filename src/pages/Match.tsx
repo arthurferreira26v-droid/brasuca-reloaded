@@ -28,10 +28,42 @@ const Match = () => {
   const opponent = teams.find(t => t.name === opponentName);
 
   // Initialize players
-  const userPlayers = teamName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(teamName);
-  const opponentPlayers = opponentName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(opponentName);
-  const userStarters = userPlayers.filter(p => p.isStarter);
-  const opponentStarters = opponentPlayers.filter(p => p.isStarter);
+  const initialUserPlayers =
+    teamName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(teamName);
+  const [userPlayers, setUserPlayers] = useState<Player[]>(initialUserPlayers);
+  const opponentPlayers =
+    opponentName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(opponentName);
+  const userStarters = userPlayers.filter((p) => p.isStarter);
+  const userReserves = userPlayers.filter((p) => !p.isStarter);
+  const opponentStarters = opponentPlayers.filter((p) => p.isStarter);
+
+  const [selectedReserve, setSelectedReserve] = useState<Player | null>(null);
+
+  const handleReserveClick = (player: Player) => {
+    setSelectedReserve(player);
+  };
+
+  const handleStarterClick = (starter: Player) => {
+    if (!selectedReserve) return;
+
+    if (starter.position !== selectedReserve.position) {
+      alert("Os jogadores devem ter a mesma posição para serem substituídos!");
+      return;
+    }
+
+    const updatedPlayers = userPlayers.map((p) => {
+      if (p.id === starter.id) {
+        return { ...p, isStarter: false };
+      }
+      if (p.id === selectedReserve.id) {
+        return { ...p, isStarter: true };
+      }
+      return p;
+    });
+
+    setUserPlayers(updatedPlayers);
+    setSelectedReserve(null);
+  };
 
   const saveMatchResult = async () => {
     if (isSavingMatch) return;
@@ -426,8 +458,46 @@ const Match = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="bottom" className="bg-black border-border h-[90vh]">
-              <div className="mt-8 overflow-y-auto h-full pb-20">
-                <TacticsManager teamName={teamName} players={userStarters} />
+              <div className="mt-8 overflow-y-auto h-full pb-20 space-y-6">
+                <TacticsManager
+                  teamName={teamName}
+                  players={userStarters}
+                  onStarterClick={handleStarterClick}
+                  canSubstitute={!!selectedReserve}
+                />
+
+                <div className="bg-zinc-900 rounded-lg p-4">
+                  <h3 className="text-white text-xl font-bold mb-4">Reservas</h3>
+                  <div className="space-y-2">
+                    {userReserves.map((player) => (
+                      <button
+                        key={player.id}
+                        onClick={() => handleReserveClick(player)}
+                        className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
+                          selectedReserve?.id === player.id
+                            ? "bg-[#c8ff00] text-black"
+                            : "bg-zinc-800 text-white hover:bg-zinc-700"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-lg">{player.number}</span>
+                          <div className="text-left">
+                            <div className="font-medium">{player.name}</div>
+                            <div className="text-sm opacity-70">{player.position}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold">{player.overall}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {selectedReserve && (
+                    <p className="mt-3 text-xs text-[#c8ff00]">
+                      Selecione um titular no campo para substituir.
+                    </p>
+                  )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>
