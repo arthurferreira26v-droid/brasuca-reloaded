@@ -39,11 +39,11 @@ export const useTeamForm = (teamName: string, championshipId: string | undefined
             if (teamScore > opponentScore) return 'V'; // Vitória
             if (teamScore === opponentScore) return 'E'; // Empate
             return 'D'; // Derrota
-          }).reverse(); // Reverter para mostrar do mais antigo ao mais recente
+          }); // Mantém do mais recente (esquerda) ao mais antigo (direita)
 
-          // Preencher com 'D' se tiver menos de 5 jogos
+          // Preencher com 'D' se tiver menos de 5 jogos, adicionando à direita
           while (formResults.length < 5) {
-            formResults.unshift('D');
+            formResults.push('D');
           }
 
           setForm(formResults);
