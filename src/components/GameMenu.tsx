@@ -57,13 +57,13 @@ export const GameMenu = ({ teamName, onManageSquad }: GameMenuProps) => {
           </Button>
           
           <Button
-             variant="ghost"
-             className="w-full justify-start gap-3 h-14"
-+            onClick={() => navigate(`/calendario?time=${teamName}`)}
-           >
-             <Calendar className="h-5 w-5" />
-             <span className="text-base">Calendário</span>
-           </Button>
+            variant="ghost"
+            className="w-full justify-start gap-3 h-14"
+            onClick={() => navigate(`/calendario?time=${teamName}`)}
+          >
+            <Calendar className="h-5 w-5" />
+            <span className="text-base">Calendário</span>
+          </Button>
           
           <Button
             variant="ghost"
