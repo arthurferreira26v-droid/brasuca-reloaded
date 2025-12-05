@@ -1,8 +1,29 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Orçamentos iniciais por time (em reais/dólares)
+const TEAM_INITIAL_BUDGETS: Record<string, number> = {
+  "Flamengo": 18000000,
+  "Palmeiras": 17000000,
+  "Botafogo": 15000000,
+  "Corinthians": 12000000,
+  "Internacional": 11000000,
+  "São Paulo": 10000000,
+  "Fluminense": 9000000,
+  "Cruzeiro": 9000000,
+  "Santos": 7000000,
+  "Grêmio": 7000000,
+  "Atlético Mineiro": 7000000,
+  "Vasco": 5000000,
+};
+
+const getInitialBudget = (teamName: string): number => {
+  return TEAM_INITIAL_BUDGETS[teamName] || 5000000;
+};
+
 export const useTeamBudget = (teamName: string, championshipId: string | undefined) => {
-  const [budget, setBudget] = useState<number>(5000000); // Valor padrão: 5 milhões
+  const initialBudget = getInitialBudget(teamName);
+  const [budget, setBudget] = useState<number>(initialBudget);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,14 +47,14 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
         if (data) {
           setBudget(data.budget);
         } else {
-          // Se não existir, criar um novo registro
+          // Se não existir, criar um novo registro com o budget inicial do time
           const { data: newBudget, error: insertError } = await supabase
             .from("team_budgets")
             .insert({
               championship_id: championshipId,
               team_id: teamName.toLowerCase().replace(/\s+/g, "-"),
               team_name: teamName,
-              budget: 5000000,
+              budget: initialBudget,
             })
             .select("budget")
             .single();
@@ -49,7 +70,7 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
     };
 
     fetchBudget();
-  }, [teamName, championshipId]);
+  }, [teamName, championshipId, initialBudget]);
 
   return { budget, loading };
 };
