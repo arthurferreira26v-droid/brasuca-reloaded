@@ -5,6 +5,8 @@ import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
 import { SquadManager } from "@/components/SquadManager";
 import { TeamBudget } from "@/components/TeamBudget";
+import { PlayerValueModal } from "@/components/PlayerValueModal";
+import { TransferMarket } from "@/components/TransferMarket";
 import { teams } from "@/data/teams";
 import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Loader2 } from "lucide-react";
@@ -12,11 +14,16 @@ import { useChampionship } from "@/hooks/useChampionship";
 import { useTeamForm } from "@/hooks/useTeamForm";
 import { useTeamBudget } from "@/hooks/useTeamBudget";
 import { getTeamLogo } from "@/utils/teamLogos";
+import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
   const teamName = searchParams.get("time") || "Seu Time";
   const [showSquadManager, setShowSquadManager] = useState(false);
+  const [showTransferMarket, setShowTransferMarket] = useState(false);
+  const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
   
   // Initialize players state
   const initialPlayers = teamName === "Botafogo" 
@@ -46,7 +53,7 @@ const Game = () => {
   const { form: opponentForm, loading: opponentFormLoading } = useTeamForm(opponentName, championship?.id);
   
   // Buscar o budget do time
-  const { budget, loading: budgetLoading } = useTeamBudget(teamName, championship?.id);
+  const { budget, setBudget, loading: budgetLoading } = useTeamBudget(teamName, championship?.id);
 
   const [selectedReserve, setSelectedReserve] = useState<Player | null>(null);
 
@@ -54,11 +61,25 @@ const Game = () => {
   const reserves = players.filter((p) => !p.isStarter);
 
   const handleReserveClick = (player: Player) => {
-    setSelectedReserve(player);
+    if (selectedReserve?.id === player.id) {
+      // Se clicar no mesmo jogador, abre o modal de valor
+      setSelectedPlayerForValue(player);
+      setSelectedReserve(null);
+    } else {
+      setSelectedReserve(player);
+    }
+  };
+
+  const handleReserveLongPress = (player: Player) => {
+    setSelectedPlayerForValue(player);
   };
 
   const handleStarterClick = (starter: Player) => {
-    if (!selectedReserve) return;
+    if (!selectedReserve) {
+      // Se não tiver reserva selecionado, mostra o valor
+      setSelectedPlayerForValue(starter);
+      return;
+    }
 
     if (starter.position !== selectedReserve.position) {
       alert("Os jogadores devem ter a mesma posição para serem substituídos!");
@@ -77,6 +98,29 @@ const Game = () => {
 
     setPlayers(updatedPlayers);
     setSelectedReserve(null);
+  };
+
+  const handleSellPlayer = (player: Player) => {
+    const sellValue = Math.floor(calculateMarketValue(player.overall) * 0.8);
+    
+    // Remove o jogador e adiciona o valor ao budget
+    const updatedPlayers = players.filter(p => p.id !== player.id);
+    setPlayers(updatedPlayers);
+    setBudget(budget + sellValue);
+    setSelectedPlayerForValue(null);
+    toast.success(`${player.name} vendido por ${formatMarketValue(sellValue)}!`);
+  };
+
+  const handleBuyPlayer = (player: Player, price: number) => {
+    // Adiciona o jogador como reserva
+    const newPlayer: Player = {
+      ...player,
+      id: `bought-${Date.now()}`,
+      isStarter: false,
+    };
+    setPlayers([...players, newPlayer]);
+    setBudget(budget - price);
+    toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
   };
 
   if (loading || userFormLoading || opponentFormLoading || budgetLoading) {
@@ -168,7 +212,11 @@ const Game = () => {
           </div>
 
           {/* Menu hamburguer - direita */}
-          <GameMenu teamName={teamName} onManageSquad={() => setShowSquadManager(true)} />
+          <GameMenu 
+            teamName={teamName} 
+            onManageSquad={() => setShowSquadManager(true)} 
+            onTransferMarket={() => setShowTransferMarket(true)}
+          />
         </div>
 
         {/* Caixa do Time */}
@@ -202,6 +250,7 @@ const Game = () => {
 
         <div className="bg-zinc-900 rounded-lg p-4">
           <h3 className="text-white text-xl font-bold mb-4">Reservas</h3>
+          <p className="text-xs text-zinc-400 mb-3">Clique para selecionar. Clique novamente para ver valor de mercado.</p>
           <div className="space-y-2">
             {reserves.map((player) => (
               <button
@@ -220,7 +269,10 @@ const Game = () => {
                     <div className="text-sm opacity-70">{player.position}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-bold ${selectedReserve?.id === player.id ? 'text-black' : 'text-green-400'}`}>
+                    {formatMarketValue(calculateMarketValue(player.overall))}
+                  </span>
                   <span className="text-sm font-bold">{player.overall}</span>
                 </div>
               </button>
@@ -240,6 +292,25 @@ const Game = () => {
           players={players}
           onClose={() => setShowSquadManager(false)}
           onSquadChange={(updatedPlayers) => setPlayers(updatedPlayers)}
+        />
+      )}
+
+      {/* Player Value Modal */}
+      {selectedPlayerForValue && (
+        <PlayerValueModal
+          player={selectedPlayerForValue}
+          onClose={() => setSelectedPlayerForValue(null)}
+          canSell={!selectedPlayerForValue.isStarter}
+          onSell={handleSellPlayer}
+        />
+      )}
+
+      {/* Transfer Market */}
+      {showTransferMarket && (
+        <TransferMarket
+          budget={budget}
+          onClose={() => setShowTransferMarket(false)}
+          onBuyPlayer={handleBuyPlayer}
         />
       )}
     </div>

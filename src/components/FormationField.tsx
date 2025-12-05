@@ -1,5 +1,6 @@
 import { Player } from "@/data/players";
 import { Formation } from "@/data/formations";
+import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
 
 interface FormationFieldProps {
   formation: Formation;
@@ -71,19 +72,19 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
         return (
           <div
             key={`${player.id}-${index}`}
-            className={`absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 ${canSubstitute && onPlayerClick ? "cursor-pointer" : ""}`}
+            className={`absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 ${onPlayerClick ? "cursor-pointer" : ""}`}
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
             }}
-            onClick={canSubstitute && onPlayerClick ? () => onPlayerClick(player) : undefined}
+            onClick={onPlayerClick ? () => onPlayerClick(player) : undefined}
           >
             {/* Círculo do jogador */}
             <div className="relative">
               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[hsl(var(--overall-blue))] flex items-center justify-center text-white text-[10px] font-bold z-10">
                 {player.overall}
               </div>
-              <div className="w-10 h-10 bg-black border-2 border-white rounded-full flex items-center justify-center shadow-lg">
+              <div className={`w-10 h-10 bg-black border-2 ${canSubstitute ? 'border-[#c8ff00]' : 'border-white'} rounded-full flex items-center justify-center shadow-lg`}>
                 <span className="text-white text-xs font-bold">{player.number}</span>
               </div>
             </div>
@@ -91,9 +92,9 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
             <div className="bg-black/70 px-2 py-0.5 rounded text-white text-[10px] font-medium whitespace-nowrap">
               {player.name}
             </div>
-            {/* Posição do jogador */}
-            <div className="bg-black/70 px-2 py-0.5 rounded text-white text-[9px] font-semibold whitespace-nowrap">
-              {player.position}
+            {/* Valor de mercado */}
+            <div className="bg-green-900/80 px-2 py-0.5 rounded text-green-400 text-[9px] font-bold whitespace-nowrap">
+              {formatMarketValue(calculateMarketValue(player.overall))}
             </div>
           </div>
         );

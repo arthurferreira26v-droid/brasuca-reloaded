@@ -12,9 +12,10 @@ import { useNavigate } from "react-router-dom";
 interface GameMenuProps {
   teamName: string;
   onManageSquad?: () => void;
+  onTransferMarket?: () => void;
 }
 
-export const GameMenu = ({ teamName, onManageSquad }: GameMenuProps) => {
+export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenuProps) => {
   const navigate = useNavigate();
 
   return (
@@ -51,6 +52,7 @@ export const GameMenu = ({ teamName, onManageSquad }: GameMenuProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
+            onClick={onTransferMarket}
           >
             <TrendingUp className="h-5 w-5" />
             <span className="text-base">Mercado de Transferências</span>

@@ -72,5 +72,21 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
     fetchBudget();
   }, [teamName, championshipId, initialBudget]);
 
-  return { budget, loading };
+  const updateBudget = async (newBudget: number) => {
+    if (!championshipId) return;
+    
+    setBudget(newBudget);
+    
+    try {
+      await supabase
+        .from("team_budgets")
+        .update({ budget: newBudget })
+        .eq("championship_id", championshipId)
+        .eq("team_name", teamName);
+    } catch (error) {
+      console.error("Erro ao atualizar budget:", error);
+    }
+  };
+
+  return { budget, setBudget: updateBudget, loading };
 };
