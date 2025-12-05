@@ -74,11 +74,13 @@ export const MatchCard = ({
                   result === 'V'
                     ? 'bg-green-600 text-white' 
                     : result === 'E'
-                    ? 'bg-gray-600 text-white'
-                    : 'bg-red-600 text-white'
+                    ? 'bg-yellow-600 text-white'
+                    : result === 'D'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700/50 text-gray-500'
                 }`}
               >
-                {result === 'V' ? '✓' : result === 'E' ? '−' : 'X'}
+                {result === 'V' ? '✓' : result === 'E' ? '−' : result === 'D' ? 'X' : ''}
               </div>
             ))}
           </div>
@@ -113,11 +115,13 @@ export const MatchCard = ({
                   result === 'V'
                     ? 'bg-green-600 text-white' 
                     : result === 'E'
-                    ? 'bg-gray-600 text-white'
-                    : 'bg-red-600 text-white'
+                    ? 'bg-yellow-600 text-white'
+                    : result === 'D'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700/50 text-gray-500'
                 }`}
               >
-                {result === 'V' ? '✓' : result === 'E' ? '−' : 'X'}
+                {result === 'V' ? '✓' : result === 'E' ? '−' : result === 'D' ? 'X' : ''}
               </div>
             ))}
           </div>
