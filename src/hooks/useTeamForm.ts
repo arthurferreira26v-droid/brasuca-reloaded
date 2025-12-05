@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type MatchResult = 'V' | 'E' | 'D'; // Vitória, Empate, Derrota
+export type MatchResult = 'V' | 'E' | 'D' | '-'; // Vitória, Empate, Derrota, Não jogado
 
 export const useTeamForm = (teamName: string, championshipId: string | undefined) => {
-  const [form, setForm] = useState<MatchResult[]>([]);
+  const [form, setForm] = useState<MatchResult[]>(['-', '-', '-', '-', '-']);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeamForm = async () => {
-      if (!championshipId) {
+      if (!championshipId || !teamName) {
+        setForm(['-', '-', '-', '-', '-']);
         setLoading(false);
         return;
       }
@@ -25,36 +26,43 @@ export const useTeamForm = (teamName: string, championshipId: string | undefined
           .order("round", { ascending: false })
           .limit(5);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erro ao buscar histórico:", error);
+          setForm(['-', '-', '-', '-', '-']);
+          setLoading(false);
+          return;
+        }
 
+        // Criar array de resultados com base nos jogos disputados
+        const formResults: MatchResult[] = [];
+        
         if (matches && matches.length > 0) {
-          // Converter os resultados em array de 'V', 'E' ou 'D'
-          const formResults: MatchResult[] = matches.map(match => {
+          matches.forEach(match => {
             const isHome = match.home_team_name === teamName;
             const teamScore = isHome ? match.home_score : match.away_score;
             const opponentScore = isHome ? match.away_score : match.home_score;
 
-            if (teamScore === null || opponentScore === null) return 'D';
-            
-            if (teamScore > opponentScore) return 'V'; // Vitória
-            if (teamScore === opponentScore) return 'E'; // Empate
-            return 'D'; // Derrota
-          }); // Mantém do mais recente (esquerda) ao mais antigo (direita)
-
-          // Preencher com 'D' se tiver menos de 5 jogos, adicionando à direita
-          while (formResults.length < 5) {
-            formResults.push('D');
-          }
-
-          setForm(formResults);
-        } else {
-          // Se não houver jogos, preencher com 'D'
-          setForm(['D', 'D', 'D', 'D', 'D']);
+            if (teamScore === null || opponentScore === null) {
+              formResults.push('-');
+            } else if (teamScore > opponentScore) {
+              formResults.push('V'); // Vitória
+            } else if (teamScore === opponentScore) {
+              formResults.push('E'); // Empate
+            } else {
+              formResults.push('D'); // Derrota
+            }
+          });
         }
+
+        // Preencher com '-' (não jogado) se tiver menos de 5 jogos
+        while (formResults.length < 5) {
+          formResults.push('-');
+        }
+
+        setForm(formResults);
       } catch (error) {
         console.error("Erro ao buscar histórico do time:", error);
-        // Em caso de erro, usar valores padrão
-        setForm(['D', 'D', 'D', 'D', 'D']);
+        setForm(['-', '-', '-', '-', '-']);
       } finally {
         setLoading(false);
       }
