@@ -10,6 +10,8 @@ interface FormationFieldProps {
 }
 
 export const FormationField = ({ formation, players, onPlayerClick, canSubstitute = false }: FormationFieldProps) => {
+  const usedPlayers = new Set<string>();
+
   // Mapeia jogadores para posições da formação
   const getPlayerForPosition = (role: string) => {
     // Mapeia os roles da formação para as posições dos jogadores
@@ -18,15 +20,15 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
       LE: ["LE"],
       LD: ["LD"],
       ZAG: ["ZAG"],
-      VOL: ["VOL"],
-      MC: ["MC", "VOL"], // MC pode usar VOL se não houver MC
-      PE: ["PE"],
-      PD: ["PD"],
+      VOL: ["VOL", "MC"],
+      MC: ["MC", "VOL"],
+      PE: ["PE", "MC", "PD"],
+      PD: ["PD", "MC", "PE"],
       ATA: ["ATA"],
-      MD: ["PD", "MC"], // Meio direito pode usar PD ou MC
-      ME: ["PE", "MC"], // Meio esquerdo pode usar PE ou MC
-      ALE: ["LE"], // Ala esquerdo usa lateral esquerdo
-      ALD: ["LD"], // Ala direito usa lateral direito
+      MD: ["PD", "MC", "PE", "VOL"], // Meio direito pode usar PD, MC, PE ou VOL
+      ME: ["PE", "MC", "PD", "VOL"], // Meio esquerdo pode usar PE, MC, PD ou VOL
+      ALE: ["LE", "PE"], // Ala esquerdo usa lateral esquerdo ou ponta
+      ALD: ["LD", "PD"], // Ala direito usa lateral direito ou ponta
     };
 
     const positions = positionMap[role] || [role];
@@ -42,8 +44,6 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
     
     return null;
   };
-
-  const usedPlayers = new Set<string>();
 
   return (
     <div className="relative w-full aspect-[3/4] bg-gradient-to-b from-green-800 to-green-900 rounded-lg overflow-hidden border-2 border-white/20">
@@ -81,7 +81,7 @@ export const FormationField = ({ formation, players, onPlayerClick, canSubstitut
           >
             {/* Círculo do jogador */}
             <div className="relative">
-              <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[hsl(var(--overall-blue))] flex items-center justify-center text-white text-[10px] font-bold z-10">
+              <div className="absolute -top-2 -left-2 w-7 h-7 rounded-full bg-[hsl(var(--overall-blue))] flex items-center justify-center text-white text-[10px] font-bold z-10">
                 {player.overall}
               </div>
               <div className={`w-10 h-10 bg-black border-2 ${canSubstitute ? 'border-[#c8ff00]' : 'border-white'} rounded-full flex items-center justify-center shadow-lg`}>
