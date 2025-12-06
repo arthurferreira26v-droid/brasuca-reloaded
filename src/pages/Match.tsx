@@ -2,12 +2,20 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
-import { botafogoPlayers, generateTeamPlayers, Player } from "@/data/players";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { TacticsManager } from "@/components/TacticsManager";
 import { ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
+interface MatchEvent {
+  minute: number;
+  type: 'goal' | 'yellow_card' | 'red_card' | 'penalty';
+  team: 'home' | 'away';
+  playerName: string;
+}
 
 const Match = () => {
   const [searchParams] = useSearchParams();
@@ -23,16 +31,33 @@ const Match = () => {
   const [fouls, setFouls] = useState({ home: 0, away: 0 });
   const [isPlaying, setIsPlaying] = useState(true);
   const [isSavingMatch, setIsSavingMatch] = useState(false);
+  const [matchEvents, setMatchEvents] = useState<MatchEvent[]>([]);
 
   const selectedTeam = teams.find(t => t.name === teamName);
   const opponent = teams.find(t => t.name === opponentName);
 
-  // Initialize players
-  const initialUserPlayers =
-    teamName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(teamName);
-  const [userPlayers, setUserPlayers] = useState<Player[]>(initialUserPlayers);
+  // Initialize players - carregar do localStorage se existir
+  const getInitialUserPlayers = () => {
+    const savedPlayers = localStorage.getItem(`players_${teamName}`);
+    if (savedPlayers) {
+      return JSON.parse(savedPlayers);
+    }
+    return teamName === "Botafogo" 
+      ? botafogoPlayers 
+      : teamName === "Flamengo"
+      ? flamengoPlayers
+      : generateTeamPlayers(teamName);
+  };
+
+  const [userPlayers, setUserPlayers] = useState<Player[]>(getInitialUserPlayers);
+  
   const opponentPlayers =
-    opponentName === "Botafogo" ? botafogoPlayers : generateTeamPlayers(opponentName);
+    opponentName === "Botafogo" 
+      ? botafogoPlayers 
+      : opponentName === "Flamengo"
+      ? flamengoPlayers
+      : generateTeamPlayers(opponentName);
+  
   const userStarters = userPlayers.filter((p) => p.isStarter);
   const userReserves = userPlayers.filter((p) => !p.isStarter);
   const opponentStarters = opponentPlayers.filter((p) => p.isStarter);
@@ -62,6 +87,8 @@ const Match = () => {
     });
 
     setUserPlayers(updatedPlayers);
+    // Salvar no localStorage também
+    localStorage.setItem(`players_${teamName}`, JSON.stringify(updatedPlayers));
     setSelectedReserve(null);
   };
 
@@ -287,6 +314,13 @@ const Match = () => {
     }
   };
 
+  // Função para escolher jogador aleatório
+  const getRandomPlayer = (team: 'home' | 'away'): string => {
+    const players = team === 'away' ? userStarters : opponentStarters;
+    if (players.length === 0) return 'Jogador';
+    return players[Math.floor(Math.random() * players.length)].name;
+  };
+
   // Timer: 90 minutos em 30 segundos reais (333ms por minuto)
   useEffect(() => {
     if (!isPlaying || minute >= 90) return;
@@ -298,11 +332,24 @@ const Match = () => {
         // Simular eventos aleatórios
         if (Math.random() < 0.05) {
           // Chance de gol
-          if (Math.random() < 0.5) {
+          const isHomeGoal = Math.random() < 0.5;
+          const scorer = getRandomPlayer(isHomeGoal ? 'home' : 'away');
+          
+          // Chance de ser pênalti (20% dos gols)
+          const isPenalty = Math.random() < 0.2;
+          
+          if (isHomeGoal) {
             setHomeScore(s => s + 1);
           } else {
             setAwayScore(s => s + 1);
           }
+          
+          setMatchEvents(events => [...events, {
+            minute: next,
+            type: isPenalty ? 'penalty' : 'goal',
+            team: isHomeGoal ? 'home' : 'away',
+            playerName: scorer
+          }]);
         }
         
         if (Math.random() < 0.15) {
@@ -316,10 +363,25 @@ const Match = () => {
         
         if (Math.random() < 0.08) {
           // Faltas
-          if (Math.random() < 0.5) {
+          const isHomeFoul = Math.random() < 0.5;
+          if (isHomeFoul) {
             setFouls(s => ({ ...s, home: s.home + 1 }));
           } else {
             setFouls(s => ({ ...s, away: s.away + 1 }));
+          }
+          
+          // Chance de cartão amarelo (30% das faltas)
+          if (Math.random() < 0.3) {
+            const cardPlayer = getRandomPlayer(isHomeFoul ? 'home' : 'away');
+            // Chance de cartão vermelho (10% dos cartões)
+            const isRed = Math.random() < 0.1;
+            
+            setMatchEvents(events => [...events, {
+              minute: next,
+              type: isRed ? 'red_card' : 'yellow_card',
+              team: isHomeFoul ? 'home' : 'away',
+              playerName: cardPlayer
+            }]);
           }
         }
         
@@ -339,6 +401,37 @@ const Match = () => {
 
     return () => clearInterval(interval);
   }, [isPlaying, minute]);
+
+  // Função para renderizar ícone do evento
+  const getEventIcon = (type: MatchEvent['type']) => {
+    switch (type) {
+      case 'goal':
+        return '⚽';
+      case 'penalty':
+        return '⚽🥅';
+      case 'yellow_card':
+        return '🟨';
+      case 'red_card':
+        return '🟥';
+      default:
+        return '';
+    }
+  };
+
+  const getEventText = (event: MatchEvent) => {
+    switch (event.type) {
+      case 'goal':
+        return `Gol de ${event.playerName}`;
+      case 'penalty':
+        return `Pênalti convertido por ${event.playerName}`;
+      case 'yellow_card':
+        return `Cartão amarelo para ${event.playerName}`;
+      case 'red_card':
+        return `Cartão vermelho para ${event.playerName}`;
+      default:
+        return '';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black">
@@ -370,7 +463,7 @@ const Match = () => {
         </div>
 
         {/* Score Board */}
-        <div className="flex items-center justify-center gap-8 mb-12">
+        <div className="flex items-center justify-center gap-8 mb-8">
           {/* Home Team */}
           <Sheet>
             <SheetTrigger asChild>
@@ -382,6 +475,9 @@ const Match = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="bg-black border-border w-full sm:max-w-lg">
+              <VisuallyHidden>
+                <SheetTitle>Táticas do {opponentName}</SheetTitle>
+              </VisuallyHidden>
               <div className="mt-8">
                 <TacticsManager teamName={opponentName} players={opponentStarters} />
               </div>
@@ -406,6 +502,9 @@ const Match = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="bg-black border-border w-full sm:max-w-lg">
+              <VisuallyHidden>
+                <SheetTitle>Táticas do {teamName}</SheetTitle>
+              </VisuallyHidden>
               <div className="mt-8">
                 <TacticsManager teamName={teamName} players={userStarters} />
               </div>
@@ -413,8 +512,41 @@ const Match = () => {
           </Sheet>
         </div>
 
+        {/* Match Events */}
+        {matchEvents.length > 0 && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="bg-zinc-900 rounded-lg p-4 max-h-40 overflow-y-auto">
+              <div className="space-y-2">
+                {matchEvents.slice().reverse().map((event, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-center gap-3 text-sm ${
+                      event.team === 'away' ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    {event.team === 'home' && (
+                      <>
+                        <span className="text-muted-foreground">{event.minute}'</span>
+                        <span>{getEventIcon(event.type)}</span>
+                        <span className="text-white">{getEventText(event)}</span>
+                      </>
+                    )}
+                    {event.team === 'away' && (
+                      <>
+                        <span className="text-white">{getEventText(event)}</span>
+                        <span>{getEventIcon(event.type)}</span>
+                        <span className="text-muted-foreground">{event.minute}'</span>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6 mt-8">
           {/* Possession */}
           <div>
             <div className="flex justify-between mb-2">
@@ -458,6 +590,9 @@ const Match = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="bottom" className="bg-black border-border h-[90vh]">
+              <VisuallyHidden>
+                <SheetTitle>Gerenciar Time</SheetTitle>
+              </VisuallyHidden>
               <div className="mt-8 overflow-y-auto h-full pb-20 space-y-6">
                 <TacticsManager
                   teamName={teamName}
@@ -480,14 +615,11 @@ const Match = () => {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-lg">{player.number}</span>
+                          <span className={`font-bold text-lg w-8 ${selectedReserve?.id === player.id ? 'text-black' : 'text-blue-400'}`}>{player.overall}</span>
                           <div className="text-left">
                             <div className="font-medium">{player.name}</div>
                             <div className="text-sm opacity-70">{player.position}</div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{player.overall}</span>
                         </div>
                       </button>
                     ))}
