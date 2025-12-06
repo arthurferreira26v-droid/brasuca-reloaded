@@ -419,18 +419,7 @@ const Match = () => {
   };
 
   const getEventText = (event: MatchEvent) => {
-    switch (event.type) {
-      case 'goal':
-        return `Gol de ${event.playerName}`;
-      case 'penalty':
-        return `Pênalti convertido por ${event.playerName}`;
-      case 'yellow_card':
-        return `Cartão amarelo para ${event.playerName}`;
-      case 'red_card':
-        return `Cartão vermelho para ${event.playerName}`;
-      default:
-        return '';
-    }
+    return event.playerName;
   };
 
   return (
