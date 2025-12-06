@@ -25,13 +25,25 @@ const Game = () => {
   const [showTransferMarket, setShowTransferMarket] = useState(false);
   const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
   
-  // Initialize players state
-  const initialPlayers = teamName === "Botafogo" 
-    ? botafogoPlayers 
-    : teamName === "Flamengo"
-    ? flamengoPlayers
-    : generateTeamPlayers(teamName);
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
+  // Initialize players state - carregar do localStorage se existir
+  const getInitialPlayers = () => {
+    const savedPlayers = localStorage.getItem(`players_${teamName}`);
+    if (savedPlayers) {
+      return JSON.parse(savedPlayers);
+    }
+    return teamName === "Botafogo" 
+      ? botafogoPlayers 
+      : teamName === "Flamengo"
+      ? flamengoPlayers
+      : generateTeamPlayers(teamName);
+  };
+  const [players, setPlayers] = useState<Player[]>(getInitialPlayers);
+
+  // Salvar jogadores no localStorage quando mudar
+  const updatePlayers = (updatedPlayers: Player[]) => {
+    setPlayers(updatedPlayers);
+    localStorage.setItem(`players_${teamName}`, JSON.stringify(updatedPlayers));
+  };
 
   // Find the selected team
   const selectedTeam = teams.find(t => t.name === teamName);
@@ -96,7 +108,7 @@ const Game = () => {
       return p;
     });
 
-    setPlayers(updatedPlayers);
+    updatePlayers(updatedPlayers);
     setSelectedReserve(null);
   };
 
@@ -105,7 +117,7 @@ const Game = () => {
     
     // Remove o jogador e adiciona o valor ao budget
     const updatedPlayers = players.filter(p => p.id !== player.id);
-    setPlayers(updatedPlayers);
+    updatePlayers(updatedPlayers);
     setBudget(budget + sellValue);
     setSelectedPlayerForValue(null);
     toast.success(`${player.name} vendido por ${formatMarketValue(sellValue)}!`);
@@ -118,7 +130,7 @@ const Game = () => {
       id: `bought-${Date.now()}`,
       isStarter: false,
     };
-    setPlayers([...players, newPlayer]);
+    updatePlayers([...players, newPlayer]);
     setBudget(budget - price);
     toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
   };

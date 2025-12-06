@@ -32,6 +32,11 @@ export const MatchCard = ({
   const navigate = useNavigate();
 
   const handlePlayMatch = () => {
+    // Salvar jogadores no localStorage antes de navegar
+    const savedPlayers = localStorage.getItem(`players_${userTeam}`);
+    if (savedPlayers) {
+      localStorage.setItem('match_players', savedPlayers);
+    }
     navigate(`/partida?time=${userTeam}&adversario=${opponentTeam}`);
   };
 
