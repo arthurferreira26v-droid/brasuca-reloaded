@@ -12,7 +12,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface MatchEvent {
   minute: number;
-  type: 'goal' | 'yellow_card' | 'red_card' | 'penalty';
+type: 'goal' | 'yellow_card' | 'red_card' | 'penalty'  | ;
   team: 'home' | 'away';
   playerName: string;
 }
@@ -370,7 +370,7 @@ const Match = () => {
             setFouls(s => ({ ...s, away: s.away + 1 }));
           }
           
-          // Chance de cartão amarelo (30% das faltas)
+          // Chance de cartão amarelo (10% das faltas)
           if (Math.random() < 0.3) {
             const cardPlayer = getRandomPlayer(isHomeFoul ? 'home' : 'away');
             // Chance de cartão vermelho (10% dos cartões)
@@ -408,7 +408,7 @@ const Match = () => {
       case 'goal':
         return '⚽';
       case 'penalty':
-        return '⚽🥅';
+        return 'penalty goal';
       case 'yellow_card':
         return '🟨';
       case 'red_card':

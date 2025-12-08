@@ -37,7 +37,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
             onClick={() => navigate(`/classificacao?time=${teamName}`)}
           >
             <Trophy className="h-5 w-5" />
-            <span className="text-base">Classificaçã</span>
+            <span className="text-base">Classificação</span>
           </Button>
 
           <Button
