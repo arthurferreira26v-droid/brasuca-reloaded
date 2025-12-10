@@ -12,7 +12,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface MatchEvent {
   minute: number;
-type: 'goal' | 'yellow_card' | 'red_card' | 'penalty'  | ;
+  type: 'goal' | 'yellow_card' | 'red_card' | 'penalty';
   team: 'home' | 'away';
   playerName: string;
 }
