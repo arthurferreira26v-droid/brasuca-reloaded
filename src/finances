@@ -1,0 +1,91 @@
+import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+const INVEST_COST = 5_000_000;
+const MATCH_RETURN = 200_000;
+
+const Finances = () => {
+  const navigate = useNavigate();
+
+  const [cash, setCash] = useState(5_000_000);
+  const [sales, setSales] = useState(15_000_000);
+  const [purchases, setPurchases] = useState(10_000_000);
+  const [hasInvestment, setHasInvestment] = useState(false);
+
+  // Simula ganho por partida
+  useEffect(() => {
+    if (!hasInvestment) return;
+
+    const interval = setInterval(() => {
+      setCash((prev) => prev + MATCH_RETURN);
+    }, 5000); // depois você troca para "fim da partida"
+
+    return () => clearInterval(interval);
+  }, [hasInvestment]);
+
+  const handleInvest = () => {
+    if (cash < INVEST_COST) return;
+
+    setCash((prev) => prev - INVEST_COST);
+    setHasInvestment(true);
+  };
+
+  const formatMoney = (value: number) =>
+    `$ ${(value / 1_000_000).toFixed(2)}M`;
+
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="relative w-full max-w-sm bg-zinc-900 rounded-2xl p-6 text-center">
+        {/* Botão fechar */}
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 text-zinc-400 text-xl"
+        >
+          ✕
+        </button>
+
+        <p className="text-zinc-400 text-sm mb-2">Caixa do Time</p>
+
+        <div className="bg-yellow-400 text-black font-bold text-2xl py-3 rounded-xl mb-6">
+          {formatMoney(cash)}
+        </div>
+
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-white">Vendas</span>
+            <span className="text-green-400">
+              {formatMoney(sales)}
+            </span>
+          </div>
+
+          <div className="flex justify-between">
+            <span className="text-white">Compras</span>
+            <span className="text-red-400">
+              {formatMoney(purchases)}
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleInvest}
+          disabled={hasInvestment || cash < INVEST_COST}
+          className={`mt-6 w-full py-3 rounded-xl font-bold transition ${
+            hasInvestment
+              ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+              : "bg-yellow-400 text-black hover:bg-yellow-300"
+          }`}
+        >
+          {hasInvestment ? "Investimento Ativo" : "Investir"}
+        </button>
+
+        {hasInvestment && (
+          <p className="text-xs text-zinc-400 mt-3">
+            +$200k por partida
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Finances;
