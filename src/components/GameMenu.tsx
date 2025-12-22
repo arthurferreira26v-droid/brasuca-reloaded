@@ -6,17 +6,41 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy, LogOut } from "lucide-react";
+import {
+  Menu,
+  Users,
+  TrendingUp,
+  Briefcase,
+  Calendar,
+  Trophy,
+  LogOut,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTeamBudget } from "@/hooks/useTeamBudget";
 
 interface GameMenuProps {
   teamName: string;
+  championshipId: string | undefined;
   onManageSquad?: () => void;
   onTransferMarket?: () => void;
 }
 
-export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenuProps) => {
+export const GameMenu = ({
+  teamName,
+  championshipId,
+  onManageSquad,
+  onTransferMarket,
+}: GameMenuProps) => {
   const navigate = useNavigate();
+
+  // 🔴 AQUI usamos o hook
+  const { resetBudget } = useTeamBudget(teamName, championshipId);
+
+  // 🔴 Função correta para sair
+  const handleExit = async () => {
+    await resetBudget();
+    navigate("/");
+  };
 
   return (
     <Sheet>
@@ -25,11 +49,14 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
+
       <SheetContent side="right" className="w-80">
         <SheetHeader>
-          <SheetTitle className="text-2xl font-bold">{teamName}</SheetTitle>
+          <SheetTitle className="text-2xl font-bold">
+            {teamName}
+          </SheetTitle>
         </SheetHeader>
-        
+
         <div className="mt-8 space-y-2">
           <Button
             variant="ghost"
@@ -48,7 +75,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
             <Users className="h-5 w-5" />
             <span className="text-base">Gerenciar Elenco</span>
           </Button>
-          
+
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
@@ -57,7 +84,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
             <TrendingUp className="h-5 w-5" />
             <span className="text-base">Mercado de Transferências</span>
           </Button>
-          
+
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
@@ -66,7 +93,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
             <Calendar className="h-5 w-5" />
             <span className="text-base">Calendário</span>
           </Button>
-          
+
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
@@ -79,7 +106,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
             <Button
               variant="ghost"
               className="w-full justify-start gap-3 h-14 text-red-500 hover:text-red-600 hover:bg-red-500/10"
-              onClick={() => navigate("/")}
+              onClick={handleExit}
             >
               <LogOut className="h-5 w-5" />
               <span className="text-base font-semibold">Sair</span>

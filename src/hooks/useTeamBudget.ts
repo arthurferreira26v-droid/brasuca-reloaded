@@ -21,7 +21,10 @@ const getInitialBudget = (teamName: string): number => {
   return TEAM_INITIAL_BUDGETS[teamName] || 5000000;
 };
 
-export const useTeamBudget = (teamName: string, championshipId: string | undefined) => {
+export const useTeamBudget = (
+  teamName: string,
+  championshipId: string | undefined
+) => {
   const initialBudget = getInitialBudget(teamName);
   const [budget, setBudget] = useState<number>(initialBudget);
   const [loading, setLoading] = useState(true);
@@ -34,7 +37,6 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
       }
 
       try {
-        // Buscar budget do time
         const { data, error } = await supabase
           .from("team_budgets")
           .select("budget")
@@ -47,7 +49,6 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
         if (data) {
           setBudget(data.budget);
         } else {
-          // Se não existir, criar um novo registro com o budget inicial do time
           const { data: newBudget, error: insertError } = await supabase
             .from("team_budgets")
             .insert({
@@ -74,9 +75,9 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
 
   const updateBudget = async (newBudget: number) => {
     if (!championshipId) return;
-    
+
     setBudget(newBudget);
-    
+
     try {
       await supabase
         .from("team_budgets")
@@ -88,5 +89,28 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
     }
   };
 
-  return { budget, setBudget: updateBudget, loading };
+  // 🔴 FUNÇÃO NOVA — RESET DO BUDGET
+  const resetBudget = async () => {
+    if (!championshipId) return;
+
+    const initial = getInitialBudget(teamName);
+    setBudget(initial);
+
+    try {
+      await supabase
+        .from("team_budgets")
+        .update({ budget: initial })
+        .eq("championship_id", championshipId)
+        .eq("team_name", teamName);
+    } catch (error) {
+      console.error("Erro ao resetar budget:", error);
+    }
+  };
+
+  return {
+    budget,
+    setBudget: updateBudget,
+    resetBudget,
+    loading,
+  };
 };

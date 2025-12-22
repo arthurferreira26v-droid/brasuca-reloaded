@@ -226,6 +226,7 @@ const Game = () => {
           {/* Menu hamburguer - direita */}
           <GameMenu 
             teamName={teamName} 
+            championshipId={championshipId}
             onManageSquad={() => setShowSquadManager(true)} 
             onTransferMarket={() => setShowTransferMarket(true)}
           />
