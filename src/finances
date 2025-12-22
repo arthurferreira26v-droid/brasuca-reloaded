@@ -1,15 +1,16 @@
-import { useNavigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const INVEST_COST = 5_000_000;
 const MATCH_RETURN = 200_000;
 
-const Finances = () => {
-  const navigate = useNavigate();
+interface FinancesProps {
+  onClose: () => void;
+}
 
+const Finances = ({ onClose }: FinancesProps) => {
   const [cash, setCash] = useState(5_000_000);
-  const [sales, setSales] = useState(15_000_000);
-  const [purchases, setPurchases] = useState(10_000_000);
+  const [sales] = useState(15_000_000);
+  const [purchases] = useState(10_000_000);
   const [hasInvestment, setHasInvestment] = useState(false);
 
   // Simula ganho por partida
@@ -18,7 +19,7 @@ const Finances = () => {
 
     const interval = setInterval(() => {
       setCash((prev) => prev + MATCH_RETURN);
-    }, 5000); // depois você troca para "fim da partida"
+    }, 5000); // depois troca para "fim da partida"
 
     return () => clearInterval(interval);
   }, [hasInvestment]);
@@ -38,7 +39,7 @@ const Finances = () => {
       <div className="relative w-full max-w-sm bg-zinc-900 rounded-2xl p-6 text-center">
         {/* Botão fechar */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={onClose}
           className="absolute top-4 left-4 text-zinc-400 text-xl"
         >
           ✕
