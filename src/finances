@@ -4,7 +4,7 @@ const INVEST_COST = 5_000_000;
 const MATCH_RETURN = 200_000;
 
 interface FinancesProps {
-  onClose: () => void;
+  onClose?: () => void; // 🔹 opcional
 }
 
 const Finances = ({ onClose }: FinancesProps) => {
@@ -13,20 +13,18 @@ const Finances = ({ onClose }: FinancesProps) => {
   const [purchases] = useState(10_000_000);
   const [hasInvestment, setHasInvestment] = useState(false);
 
-  // Simula ganho por partida
   useEffect(() => {
     if (!hasInvestment) return;
 
     const interval = setInterval(() => {
       setCash((prev) => prev + MATCH_RETURN);
-    }, 5000); // depois troca para "fim da partida"
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [hasInvestment]);
 
   const handleInvest = () => {
     if (cash < INVEST_COST) return;
-
     setCash((prev) => prev - INVEST_COST);
     setHasInvestment(true);
   };
@@ -38,12 +36,14 @@ const Finances = ({ onClose }: FinancesProps) => {
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
       <div className="relative w-full max-w-sm bg-zinc-900 rounded-2xl p-6 text-center">
         {/* Botão fechar */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 left-4 text-zinc-400 text-xl"
-        >
-          ✕
-        </button>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 left-4 text-zinc-400 text-xl"
+          >
+            ✕
+          </button>
+        )}
 
         <p className="text-zinc-400 text-sm mb-2">Caixa do Time</p>
 
