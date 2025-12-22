@@ -1,5 +1,4 @@
-import {
-  Sheet,
+t,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -33,10 +32,8 @@ export const GameMenu = ({
 }: GameMenuProps) => {
   const navigate = useNavigate();
 
-  // 🔴 AQUI usamos o hook
   const { resetBudget } = useTeamBudget(teamName, championshipId);
 
-  // 🔴 Função correta para sair
   const handleExit = async () => {
     await resetBudget();
     navigate("/");
@@ -45,7 +42,7 @@ export const GameMenu = ({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-foreground">
+        <Button variant="ghost" size="icon">
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
@@ -64,7 +61,7 @@ export const GameMenu = ({
             onClick={() => navigate(`/classificacao?time=${teamName}`)}
           >
             <Trophy className="h-5 w-5" />
-            <span className="text-base">Classificação</span>
+            Classificação
           </Button>
 
           <Button
@@ -73,7 +70,7 @@ export const GameMenu = ({
             onClick={onManageSquad}
           >
             <Users className="h-5 w-5" />
-            <span className="text-base">Gerenciar Elenco</span>
+            Gerenciar Elenco
           </Button>
 
           <Button
@@ -82,7 +79,7 @@ export const GameMenu = ({
             onClick={onTransferMarket}
           >
             <TrendingUp className="h-5 w-5" />
-            <span className="text-base">Mercado de Transferências</span>
+            Mercado de Transferências
           </Button>
 
           <Button
@@ -91,15 +88,17 @@ export const GameMenu = ({
             onClick={() => navigate(`/calendario?time=${teamName}`)}
           >
             <Calendar className="h-5 w-5" />
-            <span className="text-base">Calendário</span>
+            Calendário
           </Button>
 
+          {/* ✅ BOTÃO FINANÇAS CORRIGIDO */}
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 h-14"
+            className="w-full justify-start gap-3 h-14 bg-yellow-400/10 text-yellow-400"
+            onClick={() => navigate(`/financas?time=${teamName}`)}
           >
             <Briefcase className="h-5 w-5" />
-            <span className="text-base">Finanças</span>
+            Finanças
           </Button>
 
           <div className="pt-4 mt-4 border-t border-border">
@@ -109,7 +108,7 @@ export const GameMenu = ({
               onClick={handleExit}
             >
               <LogOut className="h-5 w-5" />
-              <span className="text-base font-semibold">Sair</span>
+              Sair
             </Button>
           </div>
         </div>
