@@ -140,6 +140,7 @@ const Game = () => {
             championshipId={championship?.id}
             onManageSquad={() => setShowSquadManager(true)}
             onTransferMarket={() => setShowTransferMarket(true)}
+            onOpenFinances={() => setShowFinances(true)}
           />
         </div>
       </header>
