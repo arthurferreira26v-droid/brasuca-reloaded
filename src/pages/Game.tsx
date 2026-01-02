@@ -1,307 +1,328 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
+import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
 import { SquadManager } from "@/components/SquadManager";
-import { TransferMarket } from "@/components/TransferMarket";
 import { TeamBudget } from "@/components/TeamBudget";
-import { Button } from "@/components/ui/button";
-import { Play, Trophy, DollarSign, X } from "lucide-react";
-import { useTeamBudget } from "@/hooks/useTeamBudget";
+import { PlayerValueModal } from "@/components/PlayerValueModal";
+import { TransferMarket } from "@/components/TransferMarket";
+import { teams } from "@/data/teams";
+import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
+import { Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
-import { Player, botafogoPlayers, flamengoPlayers, generateTeamPlayers } from "@/data/players";
+import { useTeamForm } from "@/hooks/useTeamForm";
+import { useTeamBudget } from "@/hooks/useTeamBudget";
 import { getTeamLogo } from "@/utils/teamLogos";
+import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Game = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const teamName = searchParams.get("time") || "Botafogo";
-
+  const teamName = searchParams.get("time") || "Seu Time";
   const [showSquadManager, setShowSquadManager] = useState(false);
   const [showTransferMarket, setShowTransferMarket] = useState(false);
-  const [showFinances, setShowFinances] = useState(false);
-
-  // Initialize players from localStorage or default
+  const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
+  
+  // Initialize players state - carregar do localStorage se existir
   const getInitialPlayers = () => {
     const savedPlayers = localStorage.getItem(`players_${teamName}`);
     if (savedPlayers) {
       return JSON.parse(savedPlayers);
     }
-    return teamName === "Botafogo"
-      ? botafogoPlayers
+    return teamName === "Botafogo" 
+      ? botafogoPlayers 
       : teamName === "Flamengo"
       ? flamengoPlayers
       : generateTeamPlayers(teamName);
   };
-
   const [players, setPlayers] = useState<Player[]>(getInitialPlayers);
 
-  const {
-    championship,
-    nextMatch,
-    loading: championshipLoading,
-    isChampionComplete,
-    userWonChampionship,
-    resetChampionship,
-  } = useChampionship(teamName);
+  // Salvar jogadores no localStorage quando mudar
+  const updatePlayers = (updatedPlayers: Player[]) => {
+    setPlayers(updatedPlayers);
+    localStorage.setItem(`players_${teamName}`, JSON.stringify(updatedPlayers));
+  };
 
+  // Find the selected team
+  const selectedTeam = teams.find(t => t.name === teamName);
+  
+  // Get championship data
+  const { championship, nextMatch, loading, isChampionComplete, userWonChampionship, resetChampionship } = useChampionship(teamName);
+  
+  // Determine if user is home or away based on match data
+  const isHome = nextMatch ? nextMatch.home_team_name === teamName : false;
+  const opponentName = nextMatch 
+    ? (isHome ? nextMatch.away_team_name : nextMatch.home_team_name)
+    : "";
+  const opponentLogo = nextMatch
+    ? (isHome ? nextMatch.away_team_logo : nextMatch.home_team_logo)
+    : "";
+
+  // Buscar os últimos 5 resultados reais de cada time
+  const { form: userForm, loading: userFormLoading } = useTeamForm(teamName, championship?.id);
+  const { form: opponentForm, loading: opponentFormLoading } = useTeamForm(opponentName, championship?.id);
+  
+  // Buscar o budget do time
   const { budget, setBudget, loading: budgetLoading } = useTeamBudget(teamName, championship?.id);
 
-  // Save players to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem(`players_${teamName}`, JSON.stringify(players));
-  }, [players, teamName]);
+  const [selectedReserve, setSelectedReserve] = useState<Player | null>(null);
 
   const starters = players.filter((p) => p.isStarter);
-  const currentRound = championship?.current_round || 1;
+  const reserves = players.filter((p) => !p.isStarter);
 
-  const handleSquadChange = (updatedPlayers: Player[]) => {
-    setPlayers(updatedPlayers);
-    toast.success("Escalação salva com sucesso!");
-  };
-
-  const handleBuyPlayer = (player: Player, price: number) => {
-    const newPlayer = { ...player, id: `bought_${Date.now()}`, isStarter: false };
-    setPlayers([...players, newPlayer]);
-    setBudget(budget - price);
-    toast.success(`${player.name} contratado com sucesso!`);
-  };
-
-  const handlePlayMatch = () => {
-    if (nextMatch) {
-      const isHome = nextMatch.home_team_name === teamName;
-      const opponent = isHome ? nextMatch.away_team_name : nextMatch.home_team_name;
-      navigate(
-        `/partida?time=${teamName}&adversario=${opponent}&rodada=${nextMatch.round}&campeonatoId=${championship?.id}`
-      );
+  const handleReserveClick = (player: Player) => {
+    if (selectedReserve?.id === player.id) {
+      // Se clicar no mesmo jogador, abre o modal de valor
+      setSelectedPlayerForValue(player);
+      setSelectedReserve(null);
+    } else {
+      setSelectedReserve(player);
     }
   };
 
-  if (championshipLoading || budgetLoading) {
+  const handleReserveLongPress = (player: Player) => {
+    setSelectedPlayerForValue(player);
+  };
+
+  const handleStarterClick = (starter: Player) => {
+    if (!selectedReserve) {
+      // Se não tiver reserva selecionado, mostra o valor
+      setSelectedPlayerForValue(starter);
+      return;
+    }
+
+    if (starter.position !== selectedReserve.position) {
+      alert("Os jogadores devem ter a mesma posição para serem substituídos!");
+      return;
+    }
+
+    const updatedPlayers = players.map((p) => {
+      if (p.id === starter.id) {
+        return { ...p, isStarter: false };
+      }
+      if (p.id === selectedReserve.id) {
+        return { ...p, isStarter: true };
+      }
+      return p;
+    });
+
+    updatePlayers(updatedPlayers);
+    setSelectedReserve(null);
+  };
+
+  const handleSellPlayer = (player: Player) => {
+    const sellValue = Math.floor(calculateMarketValue(player.overall) * 0.8);
+    
+    // Remove o jogador e adiciona o valor ao budget
+    const updatedPlayers = players.filter(p => p.id !== player.id);
+    updatePlayers(updatedPlayers);
+    setBudget(budget + sellValue);
+    setSelectedPlayerForValue(null);
+    toast.success(`${player.name} vendido por ${formatMarketValue(sellValue)}!`);
+  };
+
+  const handleBuyPlayer = (player: Player, price: number) => {
+    // Adiciona o jogador como reserva
+    const newPlayer: Player = {
+      ...player,
+      id: `bought-${Date.now()}`,
+      isStarter: false,
+    };
+    updatePlayers([...players, newPlayer]);
+    setBudget(budget - price);
+    toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
+  };
+
+  if (loading || userFormLoading || opponentFormLoading || budgetLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
+  // Tela de fim de campeonato
+  if (isChampionComplete && !loading) {
+    if (userWonChampionship) {
+      // Tela de celebração
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-yellow-500/20 via-black to-black flex items-center justify-center">
+          <div className="text-center px-4 max-w-2xl">
+            <div className="mb-8 animate-bounce">
+              <div className="text-8xl mb-4">🏆</div>
+              <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600 mb-4">
+                CAMPEÃO!
+              </h1>
+              <p className="text-2xl md:text-3xl text-white font-bold mb-2">
+                {teamName}
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Parabéns! Você conquistou o Brasileirão 2024!
+              </p>
+            </div>
+            
+            <button
+              onClick={resetChampionship}
+              className="bg-white hover:bg-gray-100 text-black font-bold text-xl py-4 px-12 rounded-lg transition-all transform hover:scale-105"
+            >
+              Avançar
+            </button>
+          </div>
+        </div>
+      );
+    } else {
+      // Botão de avançar simples
+      return (
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl font-bold text-white mb-4">Campeonato Finalizado</h2>
+            <p className="text-muted-foreground mb-8">O campeonato chegou ao fim.</p>
+            
+            <button
+              onClick={resetChampionship}
+              className="bg-white hover:bg-gray-100 text-black font-bold text-xl py-4 px-12 rounded-lg transition-colors"
+            >
+              Avançar
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  if (!nextMatch && !loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-foreground">Carregando...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00] mb-4 mx-auto" />
+          <p className="text-muted-foreground">Preparando próxima partida...</p>
         </div>
       </div>
     );
   }
 
-  // Championship complete screen
-  if (isChampionComplete) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          {userWonChampionship ? (
-            <>
-              <Trophy className="w-24 h-24 text-yellow-500 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-foreground mb-2">🏆 Campeão!</h1>
-              <p className="text-muted-foreground mb-6">
-                Parabéns! {teamName} conquistou o título!
-              </p>
-            </>
-          ) : (
-            <>
-              <Trophy className="w-24 h-24 text-muted-foreground mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-foreground mb-2">Temporada Encerrada</h1>
-              <p className="text-muted-foreground mb-6">
-                A temporada terminou. Tente novamente!
-              </p>
-            </>
-          )}
-          <Button onClick={resetChampionship} className="w-full">
-            Nova Temporada
-          </Button>
-        </div>
-      </div>
-    );
+  if (!nextMatch) {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-4 py-3">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-black">
+      {/* Header com info do time e menu */}
+      <header className="border-b border-[#1a2c4a] bg-black backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Time selecionado - esquerda */}
           <div className="flex items-center gap-3">
-            <img
-              src={getTeamLogo(teamName)}
-              alt={teamName}
-              className="w-10 h-10 object-contain"
-            />
-            <div>
-              <h1 className="text-lg font-bold text-foreground">{teamName}</h1>
-              <p className="text-sm text-muted-foreground">Rodada {currentRound}</p>
+            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center p-1.5">
+              <img src={selectedTeam?.logo} alt={teamName} className="w-full h-full object-contain" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-white">{teamName}</span>
+              <span className="text-xs text-muted-foreground">Jj</span>
             </div>
           </div>
-          <GameMenu
-            teamName={teamName}
-            championshipId={championship?.id}
-            onManageSquad={() => setShowSquadManager(true)}
+
+          {/* Menu hamburguer - direita */}
+          <GameMenu 
+            teamName={teamName} 
+            onManageSquad={() => setShowSquadManager(true)} 
             onTransferMarket={() => setShowTransferMarket(true)}
-            onOpenFinances={() => setShowFinances(true)}
           />
         </div>
+
+        {/* Caixa do Time */}
+        <TeamBudget budget={budget} />
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Tactics Manager with Formation */}
-        <TacticsManager teamName={teamName} players={starters} />
+      {/* Match Section */}
+      <div className="container mx-auto px-4 py-8">
+        <MatchCard
+          userTeam={teamName}
+          userLogo={getTeamLogo(teamName, selectedTeam?.logo || "")}
+          userPosition="1º"
+          opponentTeam={opponentName}
+          opponentLogo={getTeamLogo(opponentName, opponentLogo)}
+          opponentPosition="8º"
+          round={`${nextMatch.round}ª Rodada`}
+          userForm={userForm}
+          opponentForm={opponentForm}
+          isHome={isHome}
+        />
+      </div>
 
-        {/* Next Match Card */}
-        {nextMatch && (
-          <div className="p-4">
-            <div className="bg-card rounded-xl border border-border p-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                Próxima Partida
-              </h3>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={getTeamLogo(nextMatch.home_team_name)}
-                    alt={nextMatch.home_team_name}
-                    className="w-12 h-12 object-contain"
-                  />
-                  <span className="font-bold text-foreground">VS</span>
-                  <img
-                    src={getTeamLogo(nextMatch.away_team_name)}
-                    alt={nextMatch.away_team_name}
-                    className="w-12 h-12 object-contain"
-                  />
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-foreground">
-                    {nextMatch.home_team_name === teamName ? nextMatch.away_team_name : nextMatch.home_team_name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {nextMatch.home_team_name === teamName ? "Em Casa" : "Fora"}
-                  </p>
-                </div>
-              </div>
-              <Button
-                onClick={handlePlayMatch}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+      {/* Tactics Manager Section */}
+      <div className="container mx-auto px-4 pb-12 pt-8 space-y-6">
+        <TacticsManager
+          teamName={teamName}
+          players={starters}
+          onStarterClick={handleStarterClick}
+          canSubstitute={!!selectedReserve}
+        />
+
+        <div className="bg-zinc-900 rounded-lg p-4">
+          <h3 className="text-white text-xl font-bold mb-4">Reservas</h3>
+          <p className="text-xs text-zinc-400 mb-3">Clique para selecionar. Clique novamente para ver valor de mercado.</p>
+          <div className="space-y-2">
+            {reserves.map((player) => (
+              <button
+                key={player.id}
+                onClick={() => handleReserveClick(player)}
+                className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
+                  selectedReserve?.id === player.id
+                    ? "bg-[#c8ff00] text-black"
+                    : "bg-zinc-800 text-white hover:bg-zinc-700"
+                }`}
               >
-                <Play className="w-4 h-4 mr-2" />
-                Jogar Partida
-              </Button>
-            </div>
+                <div className="flex items-center gap-3">
+                  <span className={`font-bold text-lg w-8 ${selectedReserve?.id === player.id ? 'text-black' : 'text-blue-400'}`}>{player.overall}</span>
+                  <div className="text-left">
+                    <div className="font-medium">{player.name}</div>
+                    <div className="text-sm opacity-70">{player.position}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm font-bold ${selectedReserve?.id === player.id ? 'text-black' : 'text-green-400'}`}>
+                    {formatMarketValue(calculateMarketValue(player.overall))}
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="p-4 grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="h-16 flex-col gap-1"
-            onClick={() => navigate(`/classificacao?time=${teamName}`)}
-          >
-            <Trophy className="w-5 h-5" />
-            <span className="text-xs">Classificação</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-16 flex-col gap-1"
-            onClick={() => setShowFinances(true)}
-          >
-            <DollarSign className="w-5 h-5" />
-            <span className="text-xs">Finanças</span>
-          </Button>
+          {selectedReserve && (
+            <p className="mt-3 text-xs text-[#c8ff00]">
+              Selecione um titular no campo para substituir.
+            </p>
+          )}
         </div>
-      </main>
-
-      {/* Budget Footer */}
-      <TeamBudget budget={budget} />
+      </div>
 
       {/* Squad Manager Modal */}
       {showSquadManager && (
         <SquadManager
           players={players}
           onClose={() => setShowSquadManager(false)}
-          onSquadChange={handleSquadChange}
+          onSquadChange={(updatedPlayers) => setPlayers(updatedPlayers)}
         />
       )}
 
-      {/* Transfer Market Modal */}
+      {/* Player Value Modal */}
+      {selectedPlayerForValue && (
+        <PlayerValueModal
+          player={selectedPlayerForValue}
+          onClose={() => setSelectedPlayerForValue(null)}
+          canSell={!selectedPlayerForValue.isStarter}
+          onSell={handleSellPlayer}
+        />
+      )}
+
+      {/* Transfer Market */}
       {showTransferMarket && (
         <TransferMarket
           budget={budget}
           onClose={() => setShowTransferMarket(false)}
           onBuyPlayer={handleBuyPlayer}
         />
-      )}
-
-      {/* Finances Modal */}
-      {showFinances && (
-        <div className="fixed inset-0 z-50 bg-black/95 overflow-y-auto">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <DollarSign className="w-6 h-6 text-green-400" />
-                <h2 className="text-xl font-bold text-white">Finanças</h2>
-              </div>
-              <button
-                onClick={() => setShowFinances(false)}
-                className="p-2 rounded-full hover:bg-zinc-800 transition-colors"
-              >
-                <X className="w-6 h-6 text-white" />
-              </button>
-            </div>
-
-            {/* Budget Overview */}
-            <div className="bg-gradient-to-r from-green-900/40 via-green-800/40 to-green-900/40 border border-green-700/50 rounded-xl p-6 mb-6">
-              <p className="text-green-300/80 text-sm mb-1">Caixa Disponível</p>
-              <p className="text-3xl font-bold text-green-400">
-                $ {(budget / 1000000).toFixed(2)} M
-              </p>
-            </div>
-
-            {/* Financial Summary */}
-            <div className="space-y-4">
-              <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                <h3 className="text-white font-medium mb-3">Resumo Financeiro</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Receitas de Bilheteria</span>
-                    <span className="text-green-400">+ $ 2.5 M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Patrocínios</span>
-                    <span className="text-green-400">+ $ 5.0 M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Direitos de TV</span>
-                    <span className="text-green-400">+ $ 8.0 M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Salários dos Jogadores</span>
-                    <span className="text-red-400">- $ 3.5 M</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                <h3 className="text-white font-medium mb-3">Elenco</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Total de Jogadores</span>
-                    <span className="text-white">{players.length}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Titulares</span>
-                    <span className="text-white">{starters.length}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Reservas</span>
-                    <span className="text-white">{players.length - starters.length}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
