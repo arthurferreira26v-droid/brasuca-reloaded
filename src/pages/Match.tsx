@@ -113,12 +113,16 @@ const Match = () => {
         : `Liga dos Campeões - ${teamName}`;
 
       // Buscar a partida atual - incluir user_id para RLS
-      const { data: championship } = await supabase
+      // Usar limit(1) pois podem existir duplicatas
+      const { data: championships } = await supabase
         .from("championships")
         .select("id")
         .eq("name", championshipName)
         .eq("user_id", user.id)
-        .maybeSingle();
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const championship = championships?.[0];
 
       if (!championship) throw new Error("Campeonato não encontrado");
 
