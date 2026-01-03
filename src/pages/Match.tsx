@@ -106,11 +106,17 @@ const Match = () => {
     setIsSavingMatch(true);
 
     try {
+      // Determinar o nome do campeonato baseado na liga do time
+      const userTeam = teams.find(t => t.name === teamName);
+      const championshipName = userTeam?.league === "brasileiro" 
+        ? `Brasileirão - ${teamName}`
+        : `Liga dos Campeões - ${teamName}`;
+
       // Buscar a partida atual - incluir user_id para RLS
       const { data: championship } = await supabase
         .from("championships")
         .select("id")
-        .eq("name", `Brasileirão - ${teamName}`)
+        .eq("name", championshipName)
         .eq("user_id", user.id)
         .maybeSingle();
 
