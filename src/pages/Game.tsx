@@ -7,6 +7,7 @@ import { SquadManager } from "@/components/SquadManager";
 import { TeamBudget } from "@/components/TeamBudget";
 import { PlayerValueModal } from "@/components/PlayerValueModal";
 import { TransferMarket } from "@/components/TransferMarket";
+import { FinancesModal } from "@/components/FinancesModal";
 import { teams } from "@/data/teams";
 import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Loader2 } from "lucide-react";
@@ -26,6 +27,9 @@ const Game = () => {
   const teamName = searchParams.get("time") || "Seu Time";
   const [showSquadManager, setShowSquadManager] = useState(false);
   const [showTransferMarket, setShowTransferMarket] = useState(false);
+  const [showFinances, setShowFinances] = useState(false);
+  const [totalSales, setTotalSales] = useState(0);
+  const [totalPurchases, setTotalPurchases] = useState(0);
   const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
   
   // Redirect to auth if not authenticated
@@ -129,6 +133,7 @@ const Game = () => {
     const updatedPlayers = players.filter(p => p.id !== player.id);
     updatePlayers(updatedPlayers);
     setBudget(budget + sellValue);
+    setTotalSales(prev => prev + sellValue);
     setSelectedPlayerForValue(null);
     toast.success(`${player.name} vendido por ${formatMarketValue(sellValue)}!`);
   };
@@ -142,6 +147,7 @@ const Game = () => {
     };
     updatePlayers([...players, newPlayer]);
     setBudget(budget - price);
+    setTotalPurchases(prev => prev + price);
     toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
   };
 
@@ -242,6 +248,7 @@ const Game = () => {
             teamName={teamName} 
             onManageSquad={() => setShowSquadManager(true)} 
             onTransferMarket={() => setShowTransferMarket(true)}
+            onFinances={() => setShowFinances(true)}
           />
         </div>
 
@@ -336,6 +343,16 @@ const Game = () => {
           budget={budget}
           onClose={() => setShowTransferMarket(false)}
           onBuyPlayer={handleBuyPlayer}
+        />
+      )}
+
+      {/* Finances Modal */}
+      {showFinances && (
+        <FinancesModal
+          budget={budget}
+          totalSales={totalSales}
+          totalPurchases={totalPurchases}
+          onClose={() => setShowFinances(false)}
         />
       )}
     </div>
