@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
 import { TacticsManager } from "@/components/TacticsManager";
@@ -13,17 +13,27 @@ import { Loader2 } from "lucide-react";
 import { useChampionship } from "@/hooks/useChampionship";
 import { useTeamForm } from "@/hooks/useTeamForm";
 import { useTeamBudget } from "@/hooks/useTeamBudget";
+import { useAuth } from "@/hooks/useAuth";
 import { getTeamLogo } from "@/utils/teamLogos";
 import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Game = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const teamName = searchParams.get("time") || "Seu Time";
   const [showSquadManager, setShowSquadManager] = useState(false);
   const [showTransferMarket, setShowTransferMarket] = useState(false);
   const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
+  
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
   
   // Initialize players state - carregar do localStorage se existir
   const getInitialPlayers = () => {
@@ -135,12 +145,16 @@ const Game = () => {
     toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
   };
 
-  if (loading || userFormLoading || opponentFormLoading || budgetLoading) {
+  if (loading || userFormLoading || opponentFormLoading || budgetLoading || authLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   // Tela de fim de campeonato

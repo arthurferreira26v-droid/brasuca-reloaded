@@ -9,6 +9,7 @@ import Match from "./pages/Match";
 import Standings from "./pages/Standings";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/jogo" element={<Game />} />
           <Route path="/partida" element={<Match />} />
           <Route path="/classificacao" element={<Standings />} />

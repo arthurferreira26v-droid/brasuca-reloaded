@@ -5,10 +5,11 @@ import { teams } from "@/data/teams";
 import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { TacticsManager } from "@/components/TacticsManager";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MatchEvent {
   minute: number;
@@ -18,10 +19,18 @@ interface MatchEvent {
 }
 
 const Match = () => {
+  const { user, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const teamName = searchParams.get("time") || "Seu Time";
   const opponentName = searchParams.get("adversario") || "Adversário";
+  
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
 
   const [minute, setMinute] = useState(1);
   const [homeScore, setHomeScore] = useState(0);
@@ -421,6 +430,18 @@ const Match = () => {
   const getEventText = (event: MatchEvent) => {
     return event.playerName;
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black">

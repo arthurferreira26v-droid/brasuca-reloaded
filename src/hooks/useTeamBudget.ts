@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 // Orçamentos iniciais por time (em reais/dólares)
 const TEAM_INITIAL_BUDGETS: Record<string, number> = {
@@ -22,13 +23,14 @@ const getInitialBudget = (teamName: string): number => {
 };
 
 export const useTeamBudget = (teamName: string, championshipId: string | undefined) => {
+  const { user } = useAuth();
   const initialBudget = getInitialBudget(teamName);
   const [budget, setBudget] = useState<number>(initialBudget);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBudget = async () => {
-      if (!championshipId) {
+      if (!championshipId || !user) {
         setLoading(false);
         return;
       }
@@ -55,6 +57,7 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
               team_id: teamName.toLowerCase().replace(/\s+/g, "-"),
               team_name: teamName,
               budget: initialBudget,
+              user_id: user.id,
             })
             .select("budget")
             .single();
@@ -70,7 +73,7 @@ export const useTeamBudget = (teamName: string, championshipId: string | undefin
     };
 
     fetchBudget();
-  }, [teamName, championshipId, initialBudget]);
+  }, [teamName, championshipId, initialBudget, user]);
 
   const updateBudget = async (newBudget: number) => {
     if (!championshipId) return;
