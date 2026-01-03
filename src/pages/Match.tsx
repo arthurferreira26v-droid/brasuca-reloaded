@@ -102,16 +102,17 @@ const Match = () => {
   };
 
   const saveMatchResult = async () => {
-    if (isSavingMatch) return;
+    if (isSavingMatch || !user) return;
     setIsSavingMatch(true);
 
     try {
-      // Buscar a partida atual
+      // Buscar a partida atual - incluir user_id para RLS
       const { data: championship } = await supabase
         .from("championships")
         .select("id")
         .eq("name", `Brasileirão - ${teamName}`)
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
 
       if (!championship) throw new Error("Campeonato não encontrado");
 
@@ -123,7 +124,7 @@ const Match = () => {
         .or(`home_team_name.eq.${teamName},away_team_name.eq.${teamName}`)
         .order("round", { ascending: true })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (!match) throw new Error("Partida não encontrada");
 
