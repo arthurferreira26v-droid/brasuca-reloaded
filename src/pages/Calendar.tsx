@@ -1,9 +1,10 @@
 // @ts-nocheck - Database types will be updated after migration
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { teams } from "@/data/teams";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CalendarMatch {
   id: string;
@@ -18,12 +19,20 @@ interface CalendarMatch {
 }
 
 const Calendar = () => {
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const teamName = searchParams.get("time") || "Botafogo";
 
   const [matches, setMatches] = useState<CalendarMatch[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     const loadMatches = async () => {
@@ -99,6 +108,18 @@ const Calendar = () => {
   const handleBack = () => {
     navigate(`/jogo?time=${teamName}`);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black">

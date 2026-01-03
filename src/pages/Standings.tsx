@@ -1,15 +1,37 @@
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { StandingsTable } from "@/components/StandingsTable";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Standings = () => {
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const teamName = searchParams.get("time") || "Botafogo";
 
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
+
   const handleBack = () => {
     navigate(`/jogo?time=${teamName}`);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black">

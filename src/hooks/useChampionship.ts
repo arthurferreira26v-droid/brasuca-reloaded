@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { teams, Team } from "@/data/teams";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Match {
   id: string;
@@ -34,6 +35,7 @@ interface Standing {
 }
 
 export const useChampionship = (userTeamName: string) => {
+  const { user } = useAuth();
   const [championship, setChampionship] = useState<Championship | null>(null);
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +101,11 @@ export const useChampionship = (userTeamName: string) => {
     const initChampionship = async () => {
       setLoading(true);
       
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
       const userTeam = teams.find(t => t.name === userTeamName);
       if (!userTeam) {
         setLoading(false);
@@ -116,6 +123,7 @@ export const useChampionship = (userTeamName: string) => {
           .from("championships")
           .select("*")
           .eq("name", championshipName)
+          .eq("user_id", user.id)
           .limit(1);
 
         if (fetchError) throw fetchError;
@@ -168,6 +176,7 @@ export const useChampionship = (userTeamName: string) => {
               season: "2024",
               current_round: 1,
               total_rounds: (leagueTeams.length - 1) * 2,
+              user_id: user.id,
             })
             .select()
             .maybeSingle();
@@ -235,7 +244,7 @@ export const useChampionship = (userTeamName: string) => {
     };
 
     initChampionship();
-  }, [userTeamName]);
+  }, [userTeamName, user]);
 
   const resetChampionship = async () => {
     if (!championship) return;
