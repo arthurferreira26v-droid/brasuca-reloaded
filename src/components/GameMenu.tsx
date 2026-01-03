@@ -13,9 +13,10 @@ interface GameMenuProps {
   teamName: string;
   onManageSquad?: () => void;
   onTransferMarket?: () => void;
+  onFinances?: () => void;
 }
 
-export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenuProps) => {
+export const GameMenu = ({ teamName, onManageSquad, onTransferMarket, onFinances }: GameMenuProps) => {
   const navigate = useNavigate();
 
   return (
@@ -70,6 +71,7 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket }: GameMenu
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 h-14"
+            onClick={onFinances}
           >
             <Briefcase className="h-5 w-5" />
             <span className="text-base">Finanças</span>
