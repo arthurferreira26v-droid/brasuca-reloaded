@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { X, Search, ShoppingCart, DollarSign } from "lucide-react";
+import { X, Search, ShoppingCart, DollarSign, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Player } from "@/data/players";
 import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
 
 // Jogadores disponíveis no mercado
 const marketPlayers: Player[] = [
-  { id: "m1", name: "Lucas Silva", number: 8, position: "VOL", overall: 78 },
-  { id: "m2", name: "Rafael Costa", number: 11, position: "PE", overall: 80 },
-  { id: "m3", name: "Diego Souza", number: 9, position: "ATA", overall: 82 },
-  { id: "m4", name: "Marcos Vinicius", number: 5, position: "ZAG", overall: 77 },
-  { id: "m5", name: "André Luiz", number: 1, position: "GOL", overall: 79 },
-  { id: "m6", name: "Felipe Santos", number: 7, position: "PD", overall: 76 },
-  { id: "m7", name: "Carlos Eduardo", number: 10, position: "MC", overall: 83 },
-  { id: "m8", name: "Thiago Mendes", number: 6, position: "VOL", overall: 81 },
-  { id: "m9", name: "Bruno Henrique", number: 17, position: "LE", overall: 75 },
-  { id: "m10", name: "Gabriel Barbosa", number: 99, position: "ATA", overall: 85 },
-  { id: "m11", name: "Pedro Raul", number: 19, position: "ATA", overall: 79 },
-  { id: "m12", name: "Matheus Cunha", number: 20, position: "MC", overall: 84 },
+  { id: "m1", name: "Lucas Silva", number: 8, position: "VOL", overall: 78, age: 26 },
+  { id: "m2", name: "Rafael Costa", number: 11, position: "PE", overall: 80, age: 23 },
+  { id: "m3", name: "Diego Souza", number: 9, position: "ATA", overall: 82, age: 35 },
+  { id: "m4", name: "Marcos Vinicius", number: 5, position: "ZAG", overall: 77, age: 21 },
+  { id: "m5", name: "André Luiz", number: 1, position: "GOL", overall: 79, age: 28 },
+  { id: "m6", name: "Felipe Santos", number: 7, position: "PD", overall: 76, age: 19 },
+  { id: "m7", name: "Carlos Eduardo", number: 10, position: "MC", overall: 83, age: 30 },
+  { id: "m8", name: "Thiago Mendes", number: 6, position: "VOL", overall: 81, age: 32 },
+  { id: "m9", name: "Bruno Henrique", number: 17, position: "LE", overall: 75, age: 22 },
+  { id: "m10", name: "Gabriel Barbosa", number: 99, position: "ATA", overall: 85, age: 28 },
+  { id: "m11", name: "Pedro Raul", number: 19, position: "ATA", overall: 79, age: 27 },
+  { id: "m12", name: "Matheus Cunha", number: 20, position: "MC", overall: 84, age: 25 },
 ];
 
 interface TransferMarketProps {
@@ -129,6 +129,22 @@ export const TransferMarket = ({ budget, onClose, onBuyPlayer }: TransferMarketP
                       <span className="px-2 py-0.5 bg-blue-600 rounded text-xs font-bold text-white">
                         {player.overall}
                       </span>
+                      <span className="text-xs text-zinc-500">{player.age} anos</span>
+                      {player.age < 24 && (
+                        <span className="flex items-center text-green-400 text-xs" title="Potencial de evolução">
+                          <TrendingUp className="w-3 h-3" />
+                        </span>
+                      )}
+                      {player.age >= 24 && player.age <= 30 && (
+                        <span className="flex items-center text-yellow-400 text-xs" title="Estável">
+                          <Minus className="w-3 h-3" />
+                        </span>
+                      )}
+                      {player.age > 30 && (
+                        <span className="flex items-center text-red-400 text-xs" title="Em declínio">
+                          <TrendingDown className="w-3 h-3" />
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

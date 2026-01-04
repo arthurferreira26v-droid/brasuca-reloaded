@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useAuth } from "@/hooks/useAuth";
+import { evolveTeamPlayers } from "@/utils/playerEvolution";
 
 interface MatchEvent {
   minute: number;
@@ -345,6 +346,30 @@ const Match = () => {
             .eq("team_name", teamName);
           
           toast.success("Investimento: +$200 mil recebidos!");
+        }
+      }
+
+      // Evoluir jogadores após o jogo
+      const savedPlayers = localStorage.getItem(`players_${teamName}`);
+      if (savedPlayers) {
+        const currentPlayers = JSON.parse(savedPlayers);
+        const { evolvedPlayers, improvements, declines, improvedNames, declinedNames } = evolveTeamPlayers(currentPlayers);
+        
+        // Salvar jogadores evoluídos
+        localStorage.setItem(`players_${teamName}`, JSON.stringify(evolvedPlayers));
+        
+        // Mostrar notificações de evolução
+        if (improvements > 0) {
+          toast.success(`📈 ${improvements} jogador(es) evoluíram!`, {
+            description: improvedNames.join(", "),
+            duration: 5000,
+          });
+        }
+        if (declines > 0) {
+          toast.warning(`📉 ${declines} jogador(es) declinaram`, {
+            description: declinedNames.join(", "),
+            duration: 5000,
+          });
         }
       }
 
