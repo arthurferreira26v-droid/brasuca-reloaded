@@ -29,6 +29,9 @@ const Game = () => {
   const [showTransferMarket, setShowTransferMarket] = useState(false);
   const [showFinances, setShowFinances] = useState(false);
   const [totalSales, setTotalSales] = useState(0);
+  const [hasActiveInvestment, setHasActiveInvestment] = useState(() => {
+    return localStorage.getItem(`investment_${teamName}`) === 'true';
+  });
   const [totalPurchases, setTotalPurchases] = useState(0);
   const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
   
@@ -149,6 +152,16 @@ const Game = () => {
     setBudget(budget - price);
     setTotalPurchases(prev => prev + price);
     toast.success(`${player.name} contratado por ${formatMarketValue(price)}!`);
+  };
+
+  const handleInvest = () => {
+    const investmentCost = 4000000;
+    if (budget >= investmentCost) {
+      setBudget(budget - investmentCost);
+      setHasActiveInvestment(true);
+      localStorage.setItem(`investment_${teamName}`, 'true');
+      toast.success("Investimento realizado! Você ganhará $200 mil a cada jogo.");
+    }
   };
 
   if (loading || userFormLoading || opponentFormLoading || budgetLoading || authLoading) {
@@ -353,6 +366,8 @@ const Game = () => {
           totalSales={totalSales}
           totalPurchases={totalPurchases}
           onClose={() => setShowFinances(false)}
+          onInvest={handleInvest}
+          hasActiveInvestment={hasActiveInvestment}
         />
       )}
     </div>
