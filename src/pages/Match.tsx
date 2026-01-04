@@ -324,6 +324,30 @@ const Match = () => {
         .update({ current_round: currentRound + 1 })
         .eq("id", championship.id);
 
+      // Verificar se há investimento ativo e adicionar $200k ao budget
+      const hasInvestment = localStorage.getItem(`investment_${teamName}`) === 'true';
+      if (hasInvestment) {
+        const investmentEarnings = 200000; // $200 mil por jogo
+        
+        // Buscar budget atual do time
+        const { data: budgetData } = await supabase
+          .from("team_budgets")
+          .select("budget")
+          .eq("championship_id", championship.id)
+          .eq("team_name", teamName)
+          .maybeSingle();
+
+        if (budgetData) {
+          await supabase
+            .from("team_budgets")
+            .update({ budget: budgetData.budget + investmentEarnings })
+            .eq("championship_id", championship.id)
+            .eq("team_name", teamName);
+          
+          toast.success("Investimento: +$200 mil recebidos!");
+        }
+      }
+
       toast.success("Resultado salvo com sucesso!");
       setTimeout(() => {
         navigate(`/jogo?time=${teamName}`);
