@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Player } from "@/data/players";
 import { formations, playStyles } from "@/data/formations";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormationField } from "@/components/FormationField";
 
@@ -165,12 +165,40 @@ export const SquadManager = ({ players, onClose, onSquadChange }: SquadManagerPr
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-lg">{player.number}</span>
                   <div className="text-left">
-                    <div className="font-medium">{player.name}</div>
-                    <div className="text-sm opacity-70">{player.position}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{player.name}</span>
+                      {player.ovrChange && player.ovrChange > 0 && (
+                        <span className="flex items-center text-green-400 text-xs font-bold">
+                          <TrendingUp className="w-3 h-3 mr-0.5" />
+                          +{player.ovrChange}
+                        </span>
+                      )}
+                      {player.ovrChange && player.ovrChange < 0 && (
+                        <span className="flex items-center text-red-400 text-xs font-bold">
+                          <TrendingDown className="w-3 h-3 mr-0.5" />
+                          {player.ovrChange}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm opacity-70">
+                      <span>{player.position}</span>
+                      <span className="text-xs">• {player.age} anos</span>
+                      {player.age < 24 && (
+                        <span className="text-green-400 text-xs">↑</span>
+                      )}
+                      {player.age > 30 && (
+                        <span className="text-red-400 text-xs">↓</span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold">{player.overall}</span>
+                  <span className={`text-sm font-bold ${
+                    player.ovrChange && player.ovrChange > 0 ? 'text-green-400' : 
+                    player.ovrChange && player.ovrChange < 0 ? 'text-red-400' : ''
+                  }`}>
+                    {player.overall}
+                  </span>
                 </div>
               </button>
             ))}
