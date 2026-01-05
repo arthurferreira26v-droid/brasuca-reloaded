@@ -1,10 +1,11 @@
 // @ts-nocheck - Database types will be updated after migration
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, AlertTriangle, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { teams } from "@/data/teams";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface CalendarMatch {
   id: string;
@@ -26,6 +27,7 @@ const Calendar = () => {
 
   const [matches, setMatches] = useState<CalendarMatch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalRounds, setTotalRounds] = useState(0);
   
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -49,16 +51,27 @@ const Calendar = () => {
             ? `Brasileirão - ${teamName}`
             : `Liga dos Campeões - ${teamName}`;
 
-        const { data: championship } = await supabase
-          .from("championships")
-          .select("id")
-          .eq("name", championshipName)
-          .maybeSingle();
-
-        if (!championship) {
+        if (!user) {
           setMatches([]);
           return;
         }
+
+        const { data: championships } = await supabase
+          .from("championships")
+          .select("id, total_rounds")
+          .eq("name", championshipName)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        const championship = championships?.[0];
+        if (!championship) {
+          setMatches([]);
+          setTotalRounds(0);
+          return;
+        }
+        
+        setTotalRounds(championship.total_rounds);
 
         const { data: allMatches } = await supabase
           .from("matches")
@@ -102,12 +115,54 @@ const Calendar = () => {
       }
     };
 
-    loadMatches();
-  }, [teamName]);
+    if (user) {
+      loadMatches();
+    }
+  }, [teamName, user]);
 
   const handleBack = () => {
     navigate(`/jogo?time=${teamName}`);
   };
+
+  const handleResetChampionship = async () => {
+    if (!user) return;
+    
+    const userTeam = teams.find((t) => t.name === teamName);
+    if (!userTeam) return;
+    
+    const championshipName =
+      userTeam.league === "brasileiro"
+        ? `Brasileirão - ${teamName}`
+        : `Liga dos Campeões - ${teamName}`;
+    
+    try {
+      // Buscar campeonato atual
+      const { data: championships } = await supabase
+        .from("championships")
+        .select("id")
+        .eq("name", championshipName)
+        .eq("user_id", user.id);
+      
+      if (championships && championships.length > 0) {
+        for (const champ of championships) {
+          await supabase.from("matches").delete().eq("championship_id", champ.id);
+          await supabase.from("standings").delete().eq("championship_id", champ.id);
+          await supabase.from("team_budgets").delete().eq("championship_id", champ.id);
+          await supabase.from("championships").delete().eq("id", champ.id);
+        }
+      }
+      
+      toast.success("Campeonato reiniciado! Redirecionando...");
+      setTimeout(() => {
+        navigate(`/jogo?time=${teamName}`);
+      }, 1000);
+    } catch (error) {
+      console.error("Erro ao reiniciar campeonato:", error);
+      toast.error("Erro ao reiniciar campeonato");
+    }
+  };
+
+  const needsReset = totalRounds > 0 && totalRounds < 38;
 
   if (authLoading) {
     return (
@@ -138,6 +193,41 @@ const Calendar = () => {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
+        {/* Aviso de campeonato antigo */}
+        {needsReset && (
+          <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-yellow-500 font-bold text-sm mb-1">Campeonato Desatualizado</h3>
+                <p className="text-yellow-500/80 text-xs mb-3">
+                  Seu campeonato foi criado com {totalRounds} rodadas ({totalRounds === 22 ? 12 : Math.floor(totalRounds/2)+1} times). 
+                  Reinicie para jogar com 20 times e 38 rodadas.
+                </p>
+                <button
+                  onClick={handleResetChampionship}
+                  className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-xs py-2 px-4 rounded-lg transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Reiniciar com 20 times
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info de rodadas */}
+        {!loading && matches.length > 0 && (
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              {matches.filter(m => m.is_played).length} de {matches.length} partidas jogadas
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {totalRounds} rodadas
+            </span>
+          </div>
+        )}
+
         {loading ? (
           <p className="text-muted-foreground">Carregando partidas...</p>
         ) : matches.length === 0 ? (
