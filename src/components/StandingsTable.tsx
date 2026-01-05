@@ -78,14 +78,16 @@ export const StandingsTable = () => {
   const getPositionColor = (position: number) => {
     if (position <= 4) return "text-[#00ff87]"; // Libertadores
     if (position <= 6) return "text-[#00b8ff]"; // Pré-Libertadores
-    if (position <= 12) return "text-white"; // Meio de tabela
-    return "text-red-500"; // Rebaixamento
+    if (position <= 12) return "text-orange-400"; // Sul-Americana
+    if (position <= 16) return "text-white"; // Meio de tabela
+    return "text-red-500"; // Rebaixamento (17-20)
   };
 
   const getPositionIndicator = (position: number) => {
     if (position <= 4) return <div className="w-1 h-8 bg-[#00ff87] rounded-full" />;
     if (position <= 6) return <div className="w-1 h-8 bg-[#00b8ff] rounded-full" />;
-    if (position <= 12) return <div className="w-1 h-8 bg-white/20 rounded-full" />;
+    if (position <= 12) return <div className="w-1 h-8 bg-orange-400 rounded-full" />;
+    if (position <= 16) return <div className="w-1 h-8 bg-white/20 rounded-full" />;
     return <div className="w-1 h-8 bg-red-500 rounded-full" />;
   };
 
@@ -203,7 +205,7 @@ export const StandingsTable = () => {
 
       {/* Legend */}
       <div className="bg-white/5 border-t border-border px-4 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-[#00ff87] rounded-full" />
             <span className="text-muted-foreground">Libertadores</span>
@@ -211,6 +213,10 @@ export const StandingsTable = () => {
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-[#00b8ff] rounded-full" />
             <span className="text-muted-foreground">Pré-Libertadores</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-orange-400 rounded-full" />
+            <span className="text-muted-foreground">Sul-Americana</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-white/20 rounded-full" />
