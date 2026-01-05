@@ -19,7 +19,7 @@ export interface Team {
 }
 
 export const teams: Team[] = [
-  // Brasileiro
+  // Brasileiro (20 times)
   { id: "flamengo", name: "Flamengo", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg" },
   { id: "palmeiras", name: "Palmeiras", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg" },
   { id: "santos", name: "Santos", league: "brasileiro", rating: 4, logo: santosLogo },
@@ -32,6 +32,15 @@ export const teams: Team[] = [
   { id: "vasco", name: "Vasco da Gama", league: "brasileiro", rating: 3, logo: vascoLogo },
   { id: "fluminense", name: "Fluminense", league: "brasileiro", rating: 3, logo: fluminenseLogo },
   { id: "cruzeiro", name: "Cruzeiro", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg" },
+  // Novos times brasileiros
+  { id: "athletico-pr", name: "Atlético Paranaense", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Club_Athletico_Paranaense_2019.svg" },
+  { id: "bahia", name: "Bahia", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/8/84/ECBAHIA.svg" },
+  { id: "bragantino", name: "Bragantino", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/0/05/Red_Bull_Bragantino_logo.svg" },
+  { id: "vitoria", name: "Vitória", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/5/55/Esporte_Clube_Vit%C3%B3ria_logo.svg" },
+  { id: "coritiba", name: "Coritiba", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Coritiba_FBC_-_parana.svg" },
+  { id: "chapecoense", name: "Chapecoense", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Associacao_Chapecoense_de_Futebol_logo.svg" },
+  { id: "mirassol", name: "Mirassol", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Mirassol_Futebol_Clube.svg" },
+  { id: "remo", name: "Remo", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Clube_do_Remo.svg" },
 
   // Europeu
   { id: "real-madrid", name: "Real Madrid", league: "europeu", rating: 5, logo: realMadridLogo },
