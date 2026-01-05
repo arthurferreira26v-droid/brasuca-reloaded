@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { getTeamLogo } from "@/utils/teamLogos";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Standing {
   id: string;
@@ -21,6 +22,7 @@ interface Standing {
 }
 
 export const StandingsTable = () => {
+  const { user, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const teamName = searchParams.get("time") || "Botafogo";
   const [standings, setStandings] = useState<Standing[]>([]);
@@ -29,16 +31,20 @@ export const StandingsTable = () => {
   useEffect(() => {
     const fetchStandings = async () => {
       try {
-        const { data: championship } = await supabase
+        if (!user) return;
+
+        const { data: championships, error: champError } = await supabase
           .from("championships")
           .select("id")
           .eq("name", `Brasileirão - ${teamName}`)
-          .maybeSingle();
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
 
-        if (!championship) {
-          setLoading(false);
-          return;
-        }
+        if (champError) throw champError;
+
+        const championship = championships?.[0];
+        if (!championship) return;
 
         const { data, error } = await supabase
           .from("standings")
@@ -51,10 +57,11 @@ export const StandingsTable = () => {
         if (error) throw error;
 
         // Atualizar posições
-        const standingsWithPositions = data?.map((team, index) => ({
-          ...team,
-          position: index + 1,
-        })) || [];
+        const standingsWithPositions =
+          data?.map((team, index) => ({
+            ...team,
+            position: index + 1,
+          })) || [];
 
         setStandings(standingsWithPositions);
       } catch (error) {
@@ -64,10 +71,11 @@ export const StandingsTable = () => {
       }
     };
 
+    setLoading(true);
     fetchStandings();
-  }, [teamName]);
+  }, [teamName, user]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-[#c8ff00]" />

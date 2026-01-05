@@ -124,6 +124,7 @@ export const useChampionship = (userTeamName: string) => {
           .select("*")
           .eq("name", championshipName)
           .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
           .limit(1);
 
         if (fetchError) throw fetchError;
