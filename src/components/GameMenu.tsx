@@ -6,7 +6,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy, LogOut } from "lucide-react";
+import { Menu, Users, TrendingUp, Briefcase, Calendar, Trophy, LogOut, Save, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GameMenuProps {
@@ -14,9 +14,18 @@ interface GameMenuProps {
   onManageSquad?: () => void;
   onTransferMarket?: () => void;
   onFinances?: () => void;
+  onSaveGame?: () => void;
+  onLoadGame?: () => void;
 }
 
-export const GameMenu = ({ teamName, onManageSquad, onTransferMarket, onFinances }: GameMenuProps) => {
+export const GameMenu = ({ 
+  teamName, 
+  onManageSquad, 
+  onTransferMarket, 
+  onFinances,
+  onSaveGame,
+  onLoadGame
+}: GameMenuProps) => {
   const navigate = useNavigate();
 
   return (
@@ -77,6 +86,28 @@ export const GameMenu = ({ teamName, onManageSquad, onTransferMarket, onFinances
             <span className="text-base">Finanças</span>
           </Button>
 
+          {/* Save/Load Section */}
+          <div className="pt-4 mt-4 border-t border-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-14 text-[#c8ff00] hover:text-[#d4ff33] hover:bg-[#c8ff00]/10"
+              onClick={onSaveGame}
+            >
+              <Save className="h-5 w-5" />
+              <span className="text-base font-semibold">Salvar Jogo</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-14 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+              onClick={onLoadGame}
+            >
+              <Download className="h-5 w-5" />
+              <span className="text-base font-semibold">Carregar Jogo</span>
+            </Button>
+          </div>
+
+          {/* Exit Section */}
           <div className="pt-4 mt-4 border-t border-border">
             <Button
               variant="ghost"

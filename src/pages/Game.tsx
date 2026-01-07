@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { GameMenu } from "@/components/GameMenu";
 import { MatchCard } from "@/components/MatchCard";
@@ -8,6 +8,7 @@ import { TeamBudget } from "@/components/TeamBudget";
 import { PlayerValueModal } from "@/components/PlayerValueModal";
 import { TransferMarket } from "@/components/TransferMarket";
 import { FinancesModal } from "@/components/FinancesModal";
+import { SaveLoadModal } from "@/components/SaveLoadModal";
 import { teams } from "@/data/teams";
 import { botafogoPlayers, flamengoPlayers, generateTeamPlayers, Player } from "@/data/players";
 import { Loader2 } from "lucide-react";
@@ -15,10 +16,12 @@ import { useChampionship } from "@/hooks/useChampionship";
 import { useTeamForm } from "@/hooks/useTeamForm";
 import { useTeamBudget } from "@/hooks/useTeamBudget";
 import { useAuth } from "@/hooks/useAuth";
+import { useSaveLoad } from "@/hooks/useSaveLoad";
 import { getTeamLogo } from "@/utils/teamLogos";
 import { calculateMarketValue, formatMarketValue } from "@/utils/marketValue";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { GameSaveData } from "@/types/gameState";
 
 const Game = () => {
   const { user, loading: authLoading } = useAuth();
@@ -28,12 +31,17 @@ const Game = () => {
   const [showSquadManager, setShowSquadManager] = useState(false);
   const [showTransferMarket, setShowTransferMarket] = useState(false);
   const [showFinances, setShowFinances] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showLoadModal, setShowLoadModal] = useState(false);
   const [totalSales, setTotalSales] = useState(0);
   const [hasActiveInvestment, setHasActiveInvestment] = useState(() => {
     return localStorage.getItem(`investment_${teamName}`) === 'true';
   });
   const [totalPurchases, setTotalPurchases] = useState(0);
   const [selectedPlayerForValue, setSelectedPlayerForValue] = useState<Player | null>(null);
+  
+  // Save/Load hook
+  const { autoSave } = useSaveLoad();
   
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -164,6 +172,50 @@ const Game = () => {
     }
   };
 
+  // Prepare save data for save modal
+  const getCurrentGameData = useCallback(() => ({
+    clubName: teamName,
+    season: '2024',
+    budget,
+    totalSales,
+    totalPurchases,
+    hasActiveInvestment,
+    players,
+    championshipId: championship?.id,
+    currentRound: championship?.current_round,
+    seasonStats: {
+      matchesPlayed: championship?.current_round ? championship.current_round - 1 : 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      goalsFor: 0,
+      goalsAgainst: 0
+    }
+  }), [teamName, budget, totalSales, totalPurchases, hasActiveInvestment, players, championship]);
+
+  // Handle loading a save
+  const handleLoadComplete = useCallback((saveData: GameSaveData) => {
+    // Update players from save
+    const loadedPlayers = saveData.players.map(p => ({
+      ...p,
+      isStarter: p.status === 'titular'
+    }));
+    updatePlayers(loadedPlayers);
+    
+    // Update financial data
+    setTotalSales(saveData.totalSales);
+    setTotalPurchases(saveData.totalPurchases);
+    setHasActiveInvestment(saveData.hasActiveInvestment);
+    localStorage.setItem(`investment_${teamName}`, saveData.hasActiveInvestment.toString());
+    
+    // Update budget in database
+    if (saveData.budget !== budget) {
+      setBudget(saveData.budget);
+    }
+    
+    toast.success(`Jogo carregado: ${saveData.clubName}`);
+  }, [teamName, budget, setBudget, updatePlayers]);
+
   if (loading || userFormLoading || opponentFormLoading || budgetLoading || authLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -262,6 +314,8 @@ const Game = () => {
             onManageSquad={() => setShowSquadManager(true)} 
             onTransferMarket={() => setShowTransferMarket(true)}
             onFinances={() => setShowFinances(true)}
+            onSaveGame={() => setShowSaveModal(true)}
+            onLoadGame={() => setShowLoadModal(true)}
           />
         </div>
 
@@ -370,6 +424,22 @@ const Game = () => {
           hasActiveInvestment={hasActiveInvestment}
         />
       )}
+
+      {/* Save Modal */}
+      <SaveLoadModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        mode="save"
+        currentGameData={getCurrentGameData()}
+      />
+
+      {/* Load Modal */}
+      <SaveLoadModal
+        isOpen={showLoadModal}
+        onClose={() => setShowLoadModal(false)}
+        mode="load"
+        onLoadComplete={handleLoadComplete}
+      />
     </div>
   );
 };
