@@ -10,6 +10,12 @@ import corinthiansLogo from "@/assets/teams/corinthians.png";
 import fluminenseLogo from "@/assets/teams/fluminense.png";
 import gremioLogo from "@/assets/teams/gremio.svg";
 import atleticoMgLogo from "@/assets/teams/atletico-mg.png";
+import remoLogo from "@/assets/teams/remo.png";
+import mirassolLogo from "@/assets/teams/mirassol.png";
+import bahiaLogo from "@/assets/teams/bahia.png";
+import bragantinoLogo from "@/assets/teams/bragantino.png";
+import vitoriaLogo from "@/assets/teams/vitoria.png";
+import athleticoPrLogo from "@/assets/teams/athletico-pr.svg";
 
 export interface Team {
   id: string;
@@ -34,14 +40,14 @@ export const teams: Team[] = [
   { id: "fluminense", name: "Fluminense", league: "brasileiro", rating: 3, logo: fluminenseLogo },
   { id: "cruzeiro", name: "Cruzeiro", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg" },
   // Novos times brasileiros
-  { id: "athletico-pr", name: "Atlético Paranaense", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Club_Athletico_Paranaense_2019.svg" },
-  { id: "bahia", name: "Bahia", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/8/84/ECBAHIA.svg" },
-  { id: "bragantino", name: "Bragantino", league: "brasileiro", rating: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/0/05/Red_Bull_Bragantino_logo.svg" },
-  { id: "vitoria", name: "Vitória", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/5/55/Esporte_Clube_Vit%C3%B3ria_logo.svg" },
+  { id: "athletico-pr", name: "Atlético Paranaense", league: "brasileiro", rating: 4, logo: athleticoPrLogo },
+  { id: "bahia", name: "Bahia", league: "brasileiro", rating: 3, logo: bahiaLogo },
+  { id: "bragantino", name: "Bragantino", league: "brasileiro", rating: 3, logo: bragantinoLogo },
+  { id: "vitoria", name: "Vitória", league: "brasileiro", rating: 2, logo: vitoriaLogo },
   { id: "coritiba", name: "Coritiba", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Coritiba_FBC_-_parana.svg" },
   { id: "chapecoense", name: "Chapecoense", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Associacao_Chapecoense_de_Futebol_logo.svg" },
-  { id: "mirassol", name: "Mirassol", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Mirassol_Futebol_Clube.svg" },
-  { id: "remo", name: "Remo", league: "brasileiro", rating: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Clube_do_Remo.svg" },
+  { id: "mirassol", name: "Mirassol", league: "brasileiro", rating: 2, logo: mirassolLogo },
+  { id: "remo", name: "Remo", league: "brasileiro", rating: 2, logo: remoLogo },
 
   // Europeu
   { id: "real-madrid", name: "Real Madrid", league: "europeu", rating: 5, logo: realMadridLogo },
