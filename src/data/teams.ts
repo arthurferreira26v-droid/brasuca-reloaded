@@ -5,6 +5,7 @@ import liverpoolLogo from "@/assets/teams/liverpool.png";
 import psgLogo from "@/assets/teams/psg.png";
 import vascoLogo from "@/assets/teams/vasco.png";
 import santosLogo from "@/assets/teams/santos.png";
+import flamengoLogo from "@/assets/teams/flamengo.png";
 import corinthiansLogo from "@/assets/teams/corinthians.png";
 import fluminenseLogo from "@/assets/teams/fluminense.png";
 import gremioLogo from "@/assets/teams/gremio.svg";
@@ -20,7 +21,7 @@ export interface Team {
 
 export const teams: Team[] = [
   // Brasileiro (20 times)
-  { id: "flamengo", name: "Flamengo", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg" },
+  { id: "flamengo", name: "Flamengo", league: "brasileiro", rating: 5, logo: flamengoLogo },
   { id: "palmeiras", name: "Palmeiras", league: "brasileiro", rating: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg" },
   { id: "santos", name: "Santos", league: "brasileiro", rating: 4, logo: santosLogo },
   { id: "sao-paulo", name: "São Paulo", league: "brasileiro", rating: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Sao_Paulo_Futebol_Clube.svg" },
