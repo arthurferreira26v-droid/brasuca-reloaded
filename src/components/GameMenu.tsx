@@ -90,20 +90,20 @@ export const GameMenu = ({
           <div className="pt-4 mt-4 border-t border-border">
             <Button
               variant="ghost"
-              className="w-full justify-start gap-3 h-14 text-[#c8ff00] hover:text-[#d4ff33] hover:bg-[#c8ff00]/10"
+              className="w-full justify-start gap-3 h-14"
               onClick={onSaveGame}
             >
               <Save className="h-5 w-5" />
-              <span className="text-base font-semibold">Salvar Jogo</span>
+              <span className="text-base">Salvar Jogo</span>
             </Button>
 
             <Button
               variant="ghost"
-              className="w-full justify-start gap-3 h-14 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+              className="w-full justify-start gap-3 h-14"
               onClick={onLoadGame}
             >
               <Download className="h-5 w-5" />
-              <span className="text-base font-semibold">Carregar Jogo</span>
+              <span className="text-base">Carregar Jogo</span>
             </Button>
           </div>
 
