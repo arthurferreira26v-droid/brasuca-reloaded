@@ -17,7 +17,7 @@ import bragantinoLogo from "@/assets/teams/bragantino.png";
 import vitoriaLogo from "@/assets/teams/vitoria.png";
 import athleticoPrLogo from "@/assets/teams/athletico-pr.svg";
 import coritibalogo from "@/assets/teams/coritiba.png";
-import chapecoenselogo from '@assets/teams/chapecoense.png";'
+import chapecoenselogo from "@assets/teams/chapecoense.png";
 
 export interface Team {
   id: string;
